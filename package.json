@@ -1,0 +1,39 @@
+{
+  "name": "fivebits-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/senai-661/FiveBits-backend.git"
+  },
+  "keywords": [],
+  "author": "FiveBits",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/senai-661/FiveBits-backend/issues"
+  },
+  "homepage": "https://github.com/senai-661/FiveBits-backend#readme",
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.1.0",
+    "@types/pg": "^8.16.0",
+    "nodemon": "^3.1.11",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "pg": "^8.17.2"
+  }
+}
