@@ -7,7 +7,7 @@ dotenv.config();
  * Classe que representa o modelo de banco de dados.
  */
 export class DatabaseModel {
-    
+
     /**
      * Configuração para conexão com o banco de dados
      */

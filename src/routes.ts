@@ -4,7 +4,7 @@ import type { Request, Response } from "express"; //Importa os módulos de requi
 const router = Router(); //Cria uma instância de Router
 
 router.get("/api", (req: Request, res: Response) => {
-    res.status(200).json({mensagem: "Olá, seja bem-vindo!"})
+    res.status(200).json({ mensagem: "Olá, seja bem-vindo!" })
 });
 
 export { router };
