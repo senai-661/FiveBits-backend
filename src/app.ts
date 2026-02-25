@@ -1,4 +1,4 @@
-import { DatabaseModel } from "./model/DataBaseModel.js";
+import { DatabaseModel } from "./model/DatabaseModel.js";
 import { server } from "./server.js";
 
 const port: number = 3333; //Define a porta que o servidor vai executar

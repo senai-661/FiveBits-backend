@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import Paciente from "../model/Paciente.js";
-import type { PacienteDTO } from "../model/Paciente.js"; // Importa a interface DTO definida no Model
+import type { PacienteDTO } from "../interface/PacienteDTO.js" // Importa a interface DTO definida na Interface
 
 /**
  * Classe responsável por receber a requisição do paciente, 

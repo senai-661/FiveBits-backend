@@ -6,7 +6,8 @@ CREATE TABLE Paciente (
     email VARCHAR(100) UNIQUE NOT NULL,
 	telefone VARCHAR (20),
     senha_paciente VARCHAR(255) NOT NULL, 
-   	data_nascimento DATE NOT NULL
+   	data_nascimento DATE NOT NULL,
+    situacao BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 CREATE TABLE Medico(
@@ -15,7 +16,8 @@ CREATE TABLE Medico(
     crm VARCHAR(13) UNIQUE NOT NULL,
     especialidade VARCHAR(100) NOT NULL,
     valor_consulta DECIMAL (6,2) NOT NULL,
-	senha_medico VARCHAR (255) NOT NULL
+	senha_medico VARCHAR (255) NOT NULL,
+    situacao BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 CREATE TABLE Consulta (
@@ -27,9 +29,9 @@ CREATE TABLE Consulta (
     modalidade VARCHAR(50) DEFAULT 'Confirmado',
     triagem_sintomas VARCHAR(100) NOT NULL,
 	FOREIGN KEY (id_paciente) REFERENCES Paciente (id_paciente),
-	FOREIGN KEY (id_medico) REFERENCES Medico (id_medico)
+	FOREIGN KEY (id_medico) REFERENCES Medico (id_medico),
+    situacao BOOLEAN NOT NULL DEFAULT TRUE
 );
-
 
 INSERT INTO Paciente (nome_paciente, cpf, email, telefone, senha_paciente, data_nascimento) VALUES 
 ('Ana Beatriz Silva', '12345678901', 'ana.beatriz@gmail.com', '11984521736', '$hoje12', '1990-05-15'),

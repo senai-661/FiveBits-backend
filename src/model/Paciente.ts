@@ -1,18 +1,7 @@
-import { DatabaseModel } from "./DataBaseModel.js"; // Importa a classe de conexão
+import { DatabaseModel } from "./DatabaseModel.js"; // Importa a classe de conexão
+import { type PacienteDTO } from "../interface/PacienteDTO.js";
 
 const database = new DatabaseModel().pool; // Inicializa o pool
-
-/**
- * Interface DTO para transferência de dados do Paciente
- */
-export interface PacienteDTO {
-    nome: string;
-    cpf: string;
-    email: string;
-    telefone: string;
-    senha: string;
-    dataNascimento: Date;
-}
 
 class Paciente {
     private idPaciente: number = 0;
@@ -22,44 +11,82 @@ class Paciente {
     private telefone: string;
     private senha: string;
     private dataNascimento: Date;
+    private situacao: boolean = true;
 
     constructor(
         _nome: string,
         _cpf: string,
         _email: string,
-        _telefone: string,
         _senha: string,
-        _dataNascimento: Date
+        _dataNascimento: Date,
+        _telefone?: string,
+        _situacao?: boolean
     ) {
         this.nome = _nome;
         this.cpf = _cpf;
         this.email = _email;
-        this.telefone = _telefone;
         this.senha = _senha;
         this.dataNascimento = _dataNascimento;
+        this.telefone = _telefone || "";
+        this.situacao = _situacao || false;
     }
 
     // Métodos GET e SET (Encapsulamento)
-    public getIdPaciente(): number { return this.idPaciente; }
-    public setIdPaciente(_id: number): void { this.idPaciente = _id; }
+    public getIdPaciente(): number {
+        return this.idPaciente;
+    }
+    public setIdPaciente(idPaciente: number): void {
+        this.idPaciente = idPaciente;
+    }
 
-    public getNome(): string { return this.nome; }
-    public setNome(_nome: string): void { this.nome = _nome; }
+    public getNome(): string {
+        return this.nome;
+    }
+    public setNome(_nome: string): void {
+        this.nome = _nome;
+    }
 
-    public getCpf(): string { return this.cpf; }
-    public setCpf(_cpf: string): void { this.cpf = _cpf; }
+    public getCpf(): string {
+        return this.cpf;
+    }
+    public setCpf(_cpf: string): void {
+        this.cpf = _cpf;
+    }
 
-    public getEmail(): string { return this.email; }
-    public setEmail(_email: string): void { this.email = _email; }
+    public getEmail(): string {
+        return this.email;
+    }
+    public setEmail(_email: string): void {
+        this.email = _email;
+    }
 
-    public getTelefone(): string { return this.telefone; }
-    public setTelefone(_tel: string): void { this.telefone = _tel; }
+    public getTelefone(): string {
+        return this.telefone;
+    }
+    public setTelefone(_telefone: string): void {
+        this.telefone = _telefone;
+    }
 
-    public getSenha(): string { return this.senha; }
-    public setSenha(_senha: string): void { this.senha = _senha; }
+    public getSenha(): string {
+        return this.senha;
+    }
+    public setSenha(_senha: string): void {
+        this.senha = _senha;
+    }
 
-    public getDataNascimento(): Date { return this.dataNascimento; }
-    public setDataNascimento(_data: Date): void { this.dataNascimento = _data; }
+    public getDataNascimento(): Date {
+        return this.dataNascimento;
+    }
+    public setDataNascimento(_dataNascimento: Date): void {
+        this.dataNascimento = _dataNascimento;
+    }
+
+    public getSituacao(): boolean {
+        return this.situacao;
+    }
+    public setSituacao(_situacao: boolean): void {
+        this.situacao = _situacao;
+    }
 
     /**
      * Insere um paciente no banco de dados
@@ -97,7 +124,7 @@ class Paciente {
         try {
             let listaPacientes: Array<Paciente> = [];
             // Regra da Sprint: Ordem Alfabética para entidades principais
-            const querySelect = `SELECT * FROM Paciente ORDER BY nome_paciente ASC;`;
+            const querySelect = `SELECT * FROM Paciente ORDER BY nome_paciente ASC WHERE situacaco=TRUE;`;
             const respostaBD = await database.query(querySelect);
 
             respostaBD.rows.forEach((pacienteBD) => {
@@ -107,7 +134,8 @@ class Paciente {
                     pacienteBD.email,
                     pacienteBD.telefone,
                     pacienteBD.senha,
-                    pacienteBD.data_nascimento
+                    pacienteBD.data_nascimento,
+                    pacienteBD.situacaco
                 );
                 novo.setIdPaciente(pacienteBD.id_paciente);
                 listaPacientes.push(novo);

@@ -18,7 +18,6 @@ router.get("/api", (req: Request, res: Response) => {
 
 // Retorna a lista com todos os pacientes (Ordem Alfabética)
 router.get("/api/pacientes", PacienteController.todos);
-
 // Insere um novo paciente no banco de dados
 router.post("/api/pacientes", PacienteController.novo);
 
