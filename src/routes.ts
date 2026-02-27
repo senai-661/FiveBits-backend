@@ -1,6 +1,8 @@
 import type { Request, Response } from "express";
 import { Router } from "express";
 import PacienteController from "./controller/PacienteController.js";
+import MedicoController from "./controller/MedicoController.js";
+import ConsultaController from "./controller/ConsultaController.js";
 
 const router = Router();
 
@@ -20,5 +22,15 @@ router.get("/api", (req: Request, res: Response) => {
 router.get("/api/pacientes", PacienteController.todos);
 // Insere um novo paciente no banco de dados
 router.post("/api/pacientes", PacienteController.novo);
+// Retorna o paciente pelo ID
+router.get("/api/paciente/:idPaciente", PacienteController.paciente);
+
+router.get("/api/medicos", MedicoController.todos);
+router.post("/api/medicos", MedicoController.novo);
+router.get("/api/medicos/:idMedico", MedicoController.medico);
+
+router.get("/api/consultas", ConsultaController.todos);
+router.post("/api/consultas", ConsultaController.novo);
+router.get("/api/consulta/:idConsulta", ConsultaController.consulta)
 
 export { router };

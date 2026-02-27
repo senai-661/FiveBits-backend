@@ -1,8 +1,9 @@
 import { DatabaseModel } from "./DatabaseModel.js"; // Importa a classe de conexão
-import { type PacienteDTO } from "../interface/PacienteDTO.js";
+import { type PacienteDTO } from "../interface/PacienteDTO.js"; // Importa a interface do Paciente
 
 const database = new DatabaseModel().pool; // Inicializa o pool
 
+// Criação da classe do Paciente
 class Paciente {
     private idPaciente: number = 0;
     private nome: string;
@@ -13,7 +14,7 @@ class Paciente {
     private dataNascimento: Date;
     private situacao: boolean = true;
 
-    constructor(
+    constructor( // Constructor da Classe
         _nome: string,
         _cpf: string,
         _email: string,
@@ -88,16 +89,14 @@ class Paciente {
         this.situacao = _situacao;
     }
 
-    /**
-     * Insere um paciente no banco de dados
-     */
+    //Insere um paciente no banco de dados
     static async cadastrarPaciente(paciente: PacienteDTO): Promise<boolean> {
         try {
-            const queryInsert = `INSERT INTO Paciente (nome_paciente, cpf, email, telefone, senha, data_nascimento)
+            const queryInsertPaciente = `INSERT INTO Paciente (nome_paciente, cpf, email, telefone, senha, data_nascimento)
                                 VALUES ($1, $2, $3, $4, $5, $6)
                                 RETURNING id_paciente;`;
 
-            const respostaBD = await database.query(queryInsert, [
+            const respostaBD = await database.query(queryInsertPaciente, [
                 paciente.nome.toUpperCase(),
                 paciente.cpf,
                 paciente.email.toLowerCase(), // Email geralmente em minúsculo
@@ -117,15 +116,13 @@ class Paciente {
         }
     }
 
-    /**
-     * Lista todos os pacientes em ordem alfabética (Regra da Sprint 04)
-     */
+    //Lista todos os pacientes em ordem alfabética (Regra da Sprint 04)
     static async listarPacientes(): Promise<Array<Paciente> | null> {
         try {
             let listaPacientes: Array<Paciente> = [];
             // Regra da Sprint: Ordem Alfabética para entidades principais
-            const querySelect = `SELECT * FROM Paciente ORDER BY nome_paciente ASC WHERE situacaco=TRUE;`;
-            const respostaBD = await database.query(querySelect);
+            const querySelectPacientes = `SELECT * FROM paciente ORDER BY nome_paciente ASC WHERE situacao=TRUE;`;
+            const respostaBD = await database.query(querySelectPacientes);
 
             respostaBD.rows.forEach((pacienteBD) => {
                 const novo = new Paciente(
@@ -135,15 +132,42 @@ class Paciente {
                     pacienteBD.telefone,
                     pacienteBD.senha,
                     pacienteBD.data_nascimento,
-                    pacienteBD.situacaco
+                    pacienteBD.situacao
                 );
-                novo.setIdPaciente(pacienteBD.id_paciente);
+                novo.setIdPaciente(pacienteBD.idPaciente);
                 listaPacientes.push(novo);
             });
 
             return listaPacientes;
         } catch (error) {
             console.error(`Erro ao listar pacientes: ${error}`);
+            return null;
+        }
+    }
+
+    // Lista o paciente pelo ID 
+    static async listarPaciente(idPaciente: number): Promise<Paciente | null> {
+        try {
+            const querySelectPaciente = `SELECT * FROM paciente WHERE id_paciente=$1 AND situacao=TRUE;`;
+
+            const respostaBD = await database.query(querySelectPaciente, [idPaciente]);
+
+            const novoPaciente: Paciente = new Paciente(
+                respostaBD.rows[0].nome_paciente,
+                respostaBD.rows[0].cpf,
+                respostaBD.rows[0].email,
+                respostaBD.rows[0].telefone,
+                respostaBD.rows[0].senha,
+                respostaBD.rows[0].data_nascimento,
+                respostaBD.rows[0].situacao
+            );
+
+            novoPaciente.setIdPaciente(respostaBD.rows[0].id_paciente);
+            novoPaciente.setSituacao(respostaBD.rows[0].situacao);
+
+            return novoPaciente;
+        } catch (error) {
+            console.error(`Erro ao buscar paciente no banco de dados. ${error}`);
             return null;
         }
     }

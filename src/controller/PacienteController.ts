@@ -64,6 +64,17 @@ class PacienteController extends Paciente {
             return res.status(500).json({ mensagem: "Não foi possível inserir o paciente devido a um erro interno." });
         }
     }
+
+    static async paciente(req: Request, res: Response): Promise<Response> {
+        try {
+            const idPaciente: number = parseInt(req.params.idPaciente as string);
+            const respostaModelo = await Paciente.listarPaciente(idPaciente);
+            return res.status(200).json(respostaModelo);
+        } catch (error) {
+            console.error(`Erro no modelo ${error}`);
+            return res.status(500).json({ mensagem: "Não foi possível obter informação de Paciente" });
+        }
+    }
 }
 
 export default PacienteController;
