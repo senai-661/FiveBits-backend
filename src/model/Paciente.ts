@@ -1,5 +1,5 @@
 import { DatabaseModel } from "./DatabaseModel.js"; // Importa a classe de conexão
-import { type PacienteDTO } from "../interface/PacienteDTO.js"; // Importa a interface do Paciente
+import { type PacienteDTO } from "../interface/PacienteDTO.js"; // Importa a interface DTO do Paciente
 
 const database = new DatabaseModel().pool; // Inicializa o pool
 
@@ -14,22 +14,23 @@ class Paciente {
     private dataNascimento: Date;
     private situacao: boolean = true;
 
-    constructor( // Constructor da Classe
+    // Constructor da Classe Paciente
+    constructor( 
         _nome: string,
         _cpf: string,
         _email: string,
         _senha: string,
         _dataNascimento: Date,
-        _telefone?: string,
-        _situacao?: boolean
+        _telefone?: string, // ? = Opcional
+        _situacao?: boolean // ? = Opcional
     ) {
         this.nome = _nome;
         this.cpf = _cpf;
         this.email = _email;
+        this.telefone = _telefone || ""; // Opcional
         this.senha = _senha;
         this.dataNascimento = _dataNascimento;
-        this.telefone = _telefone || "";
-        this.situacao = _situacao || false;
+        this.situacao = _situacao || false; // Opcional
     }
 
     // Métodos GET e SET (Encapsulamento)
@@ -92,7 +93,7 @@ class Paciente {
     //Insere um paciente no banco de dados
     static async cadastrarPaciente(paciente: PacienteDTO): Promise<boolean> {
         try {
-            const queryInsertPaciente = `INSERT INTO Paciente (nome_paciente, cpf, email, telefone, senha, data_nascimento)
+            const queryInsertPaciente = `INSERT INTO Paciente (nome_paciente, cpf, email, telefone, senha_paciente, data_nascimento)
                                 VALUES ($1, $2, $3, $4, $5, $6)
                                 RETURNING id_paciente;`;
 
@@ -102,7 +103,7 @@ class Paciente {
                 paciente.email.toLowerCase(), // Email geralmente em minúsculo
                 paciente.telefone,
                 paciente.senha,
-                paciente.dataNascimento
+                paciente.dataNascimento ? paciente.dataNascimento.toString().split('T')[0] : null
             ]);
 
             if (respostaBD.rows.length > 0) {
@@ -116,12 +117,12 @@ class Paciente {
         }
     }
 
-    //Lista todos os pacientes em ordem alfabética (Regra da Sprint 04)
+    // Lista todos os pacientes em ordem alfabética (Regra da Sprint 04)
     static async listarPacientes(): Promise<Array<Paciente> | null> {
         try {
             let listaPacientes: Array<Paciente> = [];
             // Regra da Sprint: Ordem Alfabética para entidades principais
-            const querySelectPacientes = `SELECT * FROM paciente ORDER BY nome_paciente ASC WHERE situacao=TRUE;`;
+            const querySelectPacientes = `SELECT * FROM paciente WHERE situacao=TRUE ORDER BY nome_paciente ASC;`;
             const respostaBD = await database.query(querySelectPacientes);
 
             respostaBD.rows.forEach((pacienteBD) => {
@@ -129,12 +130,13 @@ class Paciente {
                     pacienteBD.nome_paciente,
                     pacienteBD.cpf,
                     pacienteBD.email,
+                    pacienteBD.senha_paciente,
+                    pacienteBD.data_nascimento.toISOString().split('T')[0],
                     pacienteBD.telefone,
-                    pacienteBD.senha,
-                    pacienteBD.data_nascimento,
                     pacienteBD.situacao
                 );
-                novo.setIdPaciente(pacienteBD.idPaciente);
+
+                novo.setIdPaciente(pacienteBD.id_paciente);
                 listaPacientes.push(novo);
             });
 
@@ -145,7 +147,7 @@ class Paciente {
         }
     }
 
-    // Lista o paciente pelo ID 
+    // Lista um paciente pelo ID 
     static async listarPaciente(idPaciente: number): Promise<Paciente | null> {
         try {
             const querySelectPaciente = `SELECT * FROM paciente WHERE id_paciente=$1 AND situacao=TRUE;`;
@@ -158,7 +160,7 @@ class Paciente {
                 respostaBD.rows[0].email,
                 respostaBD.rows[0].telefone,
                 respostaBD.rows[0].senha,
-                respostaBD.rows[0].data_nascimento,
+                respostaBD.rows[0].data_nascimento.toISOString().split('T')[0],
                 respostaBD.rows[0].situacao
             );
 

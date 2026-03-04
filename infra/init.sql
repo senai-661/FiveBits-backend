@@ -1,4 +1,3 @@
-
 CREATE TABLE Paciente (
     id_paciente INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nome_paciente VARCHAR(50) NOT NULL,
@@ -24,7 +23,7 @@ CREATE TABLE Consulta (
     id_consulta INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_paciente INTEGER NOT NULL,
     id_medico INTEGER NOT NULL,
-    data_hora DATE,
+    data_hora TIMESTAMP,
     status VARCHAR(50) DEFAULT 'Confirmado',
     modalidade VARCHAR(30) DEFAULT 'Pessoalmente',
     triagem_sintomas VARCHAR(100) NOT NULL,
@@ -58,13 +57,13 @@ INSERT INTO Medico (nome_medico, crm, especialidade, valor_consulta, senha_medic
 ('Dra. Mayana Zatz', 'CRM01234SP', 'Genética Médica', 520.00, 'ty&&7');
 
 INSERT INTO Consulta (id_paciente, id_medico, data_hora, status, modalidade, triagem_sintomas) VALUES 
-(1, 1, '2026-02-15', 'Pessoalmente', 'Confirmado', 'Dor no peito e cansaço excessivo'),
-(2, 2, '2026-02-16', 'Pessoalmente', 'Pendente', 'Palpitação e tontura'),
-(3, 3, '2026-02-17', 'Pessoalmente', 'Confirmado', 'Febre persistente e dor de garganta'),
-(4, 4, '2026-02-18', 'Pessoalmente', 'Cancelado', 'Dores abdominais agudas'),
-(5, 5, '2026-02-19', 'Pessoalmente', 'Confirmado', 'Dificuldade urinária'),
-(6, 6, '2026-02-20', 'Pessoalmente', 'Pendente', 'Falta de ar e tosse seca'),
-(7, 7, '2026-02-21', 'Pessoalmente', 'Confirmado', 'Dores de cabeça intensas'),
-(8, 8, '2026-02-22', 'Pessoalmente', 'Concluido', 'Acompanhamento de tratamento oncológico'),
-(9, 9, '2026-02-23', 'Pessoalmente', 'Confirmado', 'Avaliação pré-operatória cardiovascular'),
-(10, 10, '2026-02-24', 'Pessoalmente', 'Confirmado', 'Consulta de rotina genética');
+(1, 1, '2026-02-15 14:30:00', 'Confirmado',  'Pessoalmente', 'Dor no peito e cansaço excessivo'),
+(2, 2, '2026-02-16 09:20:00', 'Pendente', 'Pessoalmente', 'Palpitação e tontura'),
+(3, 3, '2026-02-17 21:00:00', 'Confirmado', 'Pessoalmente', 'Febre persistente e dor de garganta'),
+(4, 4, '2026-02-18 08:50:00', 'Cancelado', 'Pessoalmente', 'Dores abdominais agudas'),
+(5, 5, '2026-02-19 15:10:00', 'Confirmado', 'Pessoalmente', 'Dificuldade urinária'),
+(6, 6, '2026-02-20 17:30:00', 'Pendente', 'Pessoalmente', 'Falta de ar e tosse seca'),
+(7, 7, '2026-02-21 10:40:00', 'Confirmado', 'Pessoalmente', 'Dores de cabeça intensas'),
+(8, 8, '2026-02-22 19:00:00', 'Concluido', 'Pessoalmente', 'Acompanhamento de tratamento oncológico'),
+(9, 9, '2026-02-23 16:30:00', 'Confirmado', 'Pessoalmente', 'Avaliação pré-operatória cardiovascular'),
+(10, 10, '2026-02-24 11:30:00', 'Confirmado', 'Pessoalmente', 'Consulta de rotina genética');

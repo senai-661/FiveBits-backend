@@ -5,8 +5,8 @@ export interface PacienteDTO {
     nome: string;
     cpf: string;
     email: string;
+    telefone?: string; // Opcional
     senha: string;
     dataNascimento: Date;
-    telefone?: string;
-    situacao?: boolean
+    situacao?: boolean // Opcional
 }

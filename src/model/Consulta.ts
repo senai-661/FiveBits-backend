@@ -1,5 +1,5 @@
 import { DatabaseModel } from "./DatabaseModel.js"; // Importa a classe de conexão
-import type { ConsultaDTO } from "../interface/ConsultaDTO.js";
+import type { ConsultaDTO } from "../interface/ConsultaDTO.js"; // Importa a interface DTO da consulta
 
 const database = new DatabaseModel().pool; // Inicializa o pool
 
@@ -13,18 +13,19 @@ class Consulta {
     private triagemSintomas: string;
     private situacao: boolean = true
 
+    // Constructor da Classe Consulta
     constructor(
         _dataHora: Date,
         _modalidade: string,
         _triagemSintomas: string,
-        _status?: string,
-        _situacao?: boolean
+        _status?: string, // ? = Opcional
+        _situacao?: boolean // ? = Opcional
     ) {
         this.dataHora = _dataHora;
+        this.status = _status || ""; // Opcional
         this.modalidade = _modalidade;
         this.triagemSintomas = _triagemSintomas;
-        this.status = _status || "";
-        this.situacao = _situacao || false;
+        this.situacao = _situacao || false; // Opcional
     }
 
     // Métodos GET e SET (Encapsulamento)
@@ -49,6 +50,20 @@ class Consulta {
         this.idMedico = _idMedico;
     }
 
+    public getDataHora(): Date {
+        return this.dataHora;
+    }
+    public setDataHora(_dataHora: Date): void {
+        this.dataHora = _dataHora;
+    }
+
+    public getStatus(): string {
+        return this.status;
+    }
+    public setStatus(_status: string): void {
+        this.status = _status;
+    }
+
     public getModalidade(): string {
         return this.modalidade;
     }
@@ -63,20 +78,6 @@ class Consulta {
         this.triagemSintomas = _triagemSintomas;
     }
 
-    public getStatus(): string {
-        return this.status;
-    }
-    public setStatus(_status: string): void {
-        this.status = _status;
-    }
-
-    public getDataHora(): Date {
-        return this.dataHora;
-    }
-    public setDataHora(_dataHora: Date): void {
-        this.dataHora = _dataHora;
-    }
-
     public getSituacao(): boolean {
         return this.situacao;
     }
@@ -84,6 +85,7 @@ class Consulta {
         this.situacao = _situacao;
     }
 
+    // Cadastra uma Consulta no banco de dados
     static async cadastrarConsulta(Consulta: ConsultaDTO): Promise<boolean> {
         try {
             const queryInsertConsulta = `INSERT INTO Consulta (id_paciente, id_medico, data_hora, status, modalidade, triagem_sintomas) VALUES 
@@ -95,8 +97,7 @@ class Consulta {
                 Consulta.dataHora,
                 Consulta.modalidade,
                 Consulta.status,
-                Consulta.triagemSintomas,
-                Consulta.situacao
+                Consulta.triagemSintomas
             ]);
 
             if (respostaBD.rows.length > 0) {
@@ -111,6 +112,7 @@ class Consulta {
         }
     }
 
+    // Lista todas as Consultas
     static async listarConsultas(): Promise<Array<Consulta> | null> {
         try {
             let listaConsultas: Array<Consulta> = [];
@@ -120,9 +122,9 @@ class Consulta {
 
             respostaBD.rows.forEach((consultaBD) => {
                 const novo = new Consulta(
-                    consultaBD.dataHora,
+                    consultaBD.data_hora.toISOString().replace('T', ' ').replace('.000Z', ''),
                     consultaBD.modalidade,
-                    consultaBD.triagemSintomas,
+                    consultaBD.triagem_sintomas,
                     consultaBD.status,
                     consultaBD.situacao
                 );
@@ -140,6 +142,7 @@ class Consulta {
         }
     }
 
+    // Lista uma consulta pelo ID
     static async listarConsulta(idConsulta: number): Promise<Consulta | null> {
         try {
             const querySelectConsulta = `SELECT * FROM Consulta WHERE id_Consulta=$1 AND situacao=TRUE;`;
@@ -147,9 +150,9 @@ class Consulta {
             const respostaBD = await database.query(querySelectConsulta, [idConsulta]);
 
             const novaConsulta: Consulta = new Consulta(
-                respostaBD.rows[0].dataHora,
+                respostaBD.rows[0].data_hora.toISOString().replace('T', ' ').replace('.000Z', ''),
                 respostaBD.rows[0].modalidade,
-                respostaBD.rows[0].triagemSintomas,
+                respostaBD.rows[0].triagem_sintomas,
                 respostaBD.rows[0].status,
                 respostaBD.rows[0].situacao
             );

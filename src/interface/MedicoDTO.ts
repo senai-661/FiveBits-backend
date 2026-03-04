@@ -8,5 +8,5 @@ export interface MedicoDTO {
     especialidade: string;
     valorConsulta: number;
     senhaMedico: string;
-    situacao?: boolean
+    situacao?: boolean // Opcional
 }

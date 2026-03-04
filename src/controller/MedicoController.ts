@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
-import Medico from "../model/Medico.js";
-import type { MedicoDTO } from "../interface/MedicoDTO.js";
+import Medico from "../model/Medico.js"; // Importa o model do médico
+import type { MedicoDTO } from "../interface/MedicoDTO.js"; // Importa a interface DTO do médico
 
 /**
  * Classe responsável por receber a requisição do Medico, 
@@ -11,7 +11,7 @@ class MedicoController extends Medico {
 
     /**
      * Faz a chamada ao modelo para obter a lista de Medicos e devolve ao cliente.
-     * * @param req Requisição do cliente
+     * @param req Requisição do cliente
      * @param res Resposta do servidor
      * @returns (200) Lista de todos os Medicos em ordem alfabética
      * @returns (500) Erro na consulta ao banco de dados
@@ -34,7 +34,7 @@ class MedicoController extends Medico {
 
     /**
      * Faz a chamada ao modelo para inserir um novo Medico.
-     * * @param req Requisição do cliente contendo o corpo (body) com os dados do Medico
+     * @param req Requisição do cliente contendo o corpo (body) com os dados do Medico
      * @param res Resposta do servidor
      * @returns (201) Mensagem de sucesso no cadastro
      * @returns (400) Erro nos dados enviados ou falha no cadastro
@@ -65,13 +65,28 @@ class MedicoController extends Medico {
         }
     }
 
+    /**
+     * Faz a chamada ao modelo para obter o ID de um médico e devolve ao cliente.
+     * @param req Requisição do cliente
+     * @param res Resposta do servidor
+     * @returns (200) Lista um objeto Medico pelo ID
+     * @returns (500) Erro na consulta ao banco de dados
+     */
     static async medico(req: Request, res: Response): Promise<Response> {
         try {
+            // Chama o ID do médico
             const idMedico: number = parseInt(req.params.idMedico as string);
+
+            // Chama o método listarMedico do Model, que retorna um objeto do tipo medico
             const respostaModelo = await Medico.listarMedico(idMedico);
+
+            // Retorna status 200 (OK) e a lista de Consultas em formato JSON
             return res.status(200).json(respostaModelo);
         } catch (error) {
+            // Log de erro para depuração
             console.error(`Erro no modelo ${error}`);
+
+            // Status 500 (Internal Server Error)
             return res.status(500).json({ mensagem: "Não foi possível obter informação de Medico" });
         }
     }

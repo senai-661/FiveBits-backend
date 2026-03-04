@@ -1,5 +1,5 @@
 import { DatabaseModel } from "./DatabaseModel.js"; // Importa a classe de conexão
-import { type MedicoDTO } from "../interface/MedicoDTO.js";
+import { type MedicoDTO } from "../interface/MedicoDTO.js"; // Importa a interface DTO do Médico
 
 const database = new DatabaseModel().pool; // Inicializa o pool
 
@@ -12,20 +12,21 @@ class Medico {
     private senhaMedico: string;
     private situacao: boolean = true;
 
-    constructor(
+    // Constructor da Classe Médico
+    constructor( 
         _nome: string,
         _crm: string,
         _especialidade: string,
         _valorConsulta: number,
         _senhaMedico: string,
-        _situacao?: boolean
+        _situacao?: boolean // ? = Opcional
     ) {
         this.nome = _nome;
         this.crm = _crm;
         this.especialidade = _especialidade;
         this.valorConsulta = _valorConsulta;
         this.senhaMedico = _senhaMedico;
-        this.situacao = _situacao || false;
+        this.situacao = _situacao || false; // Opcional
     }
 
     // Métodos GET e SET (Encapsulamento)
@@ -78,7 +79,8 @@ class Medico {
         this.situacao = _situacao
     }
 
-    static async cadastrarMedico(Medico: MedicoDTO): Promise<boolean> {
+    // Insere um médico no banco de dados
+  static async cadastrarMedico(Medico: MedicoDTO): Promise<boolean> {
         try {
             const queryInsertMedico = `INSERT INTO Medico (nome_medico, crm, especialidade, valor_consulta, senha_medico) VALUES
                                        ($1, $2, $3, $4, $5) RETURNING id_medico;`;
@@ -108,7 +110,7 @@ class Medico {
         try {
             let listaMedicos: Array<Medico> = [];
             // Regra da Sprint: Ordem Alfabética para entidades principais
-            const querySelectMedicos = `SELECT * FROM Medico ORDER BY nome_medico ASC WHERE situacao=TRUE;`;
+            const querySelectMedicos = `SELECT * FROM Medico WHERE situacao=TRUE ORDER BY nome_medico ASC;`;
             const respostaBD = await database.query(querySelectMedicos);
 
             respostaBD.rows.forEach((medicoBD) => {
@@ -120,7 +122,8 @@ class Medico {
                     medicoBD.senha_medico,
                     medicoBD.situacao
                 );
-                novo.setIdMedico(medicoBD.idMedico);
+
+                novo.setIdMedico(medicoBD.id_medico);
                 listaMedicos.push(novo);
             });
 
@@ -131,6 +134,7 @@ class Medico {
         }
     }
 
+    // Lista um médico pelo ID
     static async listarMedico(idMedico: number): Promise<Medico | null> {
         try {
             const querySelectMedico = `SELECT * FROM Medico WHERE id_medico=$1 AND situacao=TRUE;`;
@@ -146,7 +150,7 @@ class Medico {
                 respostaBD.rows[0].situacao
             );
 
-            novoMedico.setIdMedico(respostaBD.rows[0].id_Medico);
+            novoMedico.setIdMedico(respostaBD.rows[0].id_medico);
             novoMedico.setSituacao(respostaBD.rows[0].situacao);
 
             return novoMedico;
