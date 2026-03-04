@@ -1,0 +1,38 @@
+#ffffffff 
+Escolhemos a cor branca pois é uma cor simbolica de hospitais ou do tema medicina, e emitir um teor de paz e salvação.
+
+#000000
+Selecionamos o preto para a cor principal dos textos por ser o mais comum.
+
+#E8F7FE
+Esta cor foi escolhida por simbolizar uma cor de tranquilidade, segurança e confiança.
+
+#33FF00
+Faz parte da cor da logo principal do site.
+
+#0048FF
+Definimos como parte da logo principal 
+
+#3F4DE3
+Optamos esta cor por esta cor pois nos inspiramos em empresas proximas.
+
+#18C401
+Adotamos a cor verde para os botão de cadastro e login a conta por ser atraente ao publico.
+
+#FFF600
+Foi escolhida pois retrata a cor de avaliação do site.
+
+#37AEC3
+Esta cor está para destacar o nossa do nosso botão de telemedicina.
+
+#A9DEEA
+Este faz parte do botão de telemedicina.
+
+#D4D4D4
+Foi definido para o botão de cancelar.
+
+#F5F5F5
+É uma cor de um container.
+
+#BA2323
+Cor do botão de sair da conta.
