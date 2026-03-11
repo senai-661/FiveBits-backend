@@ -2,7 +2,7 @@ CREATE TABLE Paciente (
     id_paciente INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nome_paciente VARCHAR(50) NOT NULL,
     cpf VARCHAR(11) UNIQUE NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
+    email_paciente VARCHAR(100) UNIQUE NOT NULL,
 	telefone VARCHAR (20),
     senha_paciente VARCHAR(255) NOT NULL, 
    	data_nascimento DATE NOT NULL,
@@ -15,6 +15,7 @@ CREATE TABLE Medico(
     crm VARCHAR(13) UNIQUE NOT NULL,
     especialidade VARCHAR(100) NOT NULL,
     valor_consulta DECIMAL (6,2) NOT NULL,
+    email_medico VARCHAR(100)  NOT NULL,
 	senha_medico VARCHAR (255) NOT NULL,
     situacao BOOLEAN NOT NULL DEFAULT TRUE
 );
@@ -32,7 +33,7 @@ CREATE TABLE Consulta (
     situacao BOOLEAN NOT NULL DEFAULT TRUE
 );
 
-INSERT INTO Paciente (nome_paciente, cpf, email, telefone, senha_paciente, data_nascimento) VALUES 
+INSERT INTO Paciente (nome_paciente, cpf, email_paciente, telefone, senha_paciente, data_nascimento) VALUES 
 ('Ana Beatriz Silva', '12345678901', 'ana.beatriz@gmail.com', '11984521736', '$hoje12', '1990-05-15'),
 ('Carlos Eduardo Souza', '23456789012', 'carlos.edu@outlook.com', '21972635481', '$Livia@25', '1985-10-20'),
 ('Mariana Luz Ferreira', '34567890123', 'mari.luz@yahoo.com.br', '31991827364', '$hamburguer', '1992-03-12'),
@@ -44,17 +45,19 @@ INSERT INTO Paciente (nome_paciente, cpf, email, telefone, senha_paciente, data_
 ('Beatriz Antunes Melo', '90123456789', 'antunes.bea@gmail.com', '91983334422', 'loinv44', '1991-11-22'),
 ('Gustavo Henrique Paz', '01234567890', 'gustavo.paz@outlook.com', '48994445566', '09livoii', '1975-04-10');
 
-INSERT INTO Medico (nome_medico, crm, especialidade, valor_consulta, senha_medico) VALUES 
-('Dr. Roberto Kalil', 'CRM12345SP', 'Cardiologia', 450.00, 'jioL3'),
-('Dra. Ludhmila Hajjar', 'CRM23456SP', 'Cardiologia', 500.00,'Sesi89'),
-('Dr. Drauzio Varella', 'CRM34567SP', 'Clínica Geral', 350.00,'Senai987'),
-('Dra. Angelita Gama', 'CRM45678SP', 'Coloproctologia', 600.00, 'criativaSenha'),
-('Dr. Miguel Srougi', 'CRM56789SP', 'Urologia', 550.00, 'eitaLiv'),
-('Dra. Margareth Dalcolmo', 'CRM67890RJ', 'Pneumologia', 400.00, 'ezoN2'),
-('Dr. Paulo Niemeyer', 'CRM78901RJ', 'Neurocirurgia', 850.00, 'Jaoliv'),
-('Dra. Nise Yamaguchi', 'CRM89012SP', 'Oncologia', 480.00, 'PedroLov'),
-('Dr. Fábio Jatene', 'CRM90123SP', 'Cirurgia Cardiovascular', 700.00, '987RR'),
-('Dra. Mayana Zatz', 'CRM01234SP', 'Genética Médica', 520.00, 'ty&&7');
+
+INSERT INTO Medico (nome_medico, crm, especialidade, valor_consulta, email_medico, senha_medico) VALUES 
+('Dr. Roberto Kalil', 'CRM12345SP', 'Cardiologia', 450.00, 'roberto.kalil@hospital.com', 'jioL3'),
+('Dra. Ludhmila Hajjar', 'CRM23456SP', 'Cardiologia', 500.00,'ludhmila.hajjar@hospital.com', 'Sesi89'),
+('Dr. Drauzio Varella', 'CRM34567SP', 'Clínica Geral', 350.00,'drauzio.varella@hospital.com', 'Senai987'),
+('Dra. Angelita Gama', 'CRM45678SP', 'Coloproctologia', 600.00, 'angelita.gama@hospital.com', 'criativaSenha'),
+('Dr. Miguel Srougi', 'CRM56789SP', 'Urologia', 550.00, 'miguel.srougi@hospital.com', 'eitaLiv'),
+('Dra. Margareth Dalcolmo', 'CRM67890RJ', 'Pneumologia', 400.00, 'margareth.dalcolmo@hospital.com', 'ezoN2'),
+('Dr. Paulo Niemeyer', 'CRM78901RJ', 'Neurocirurgia', 850.00, 'paulo.niemeyer@hospital.com', 'Jaoliv'),
+('Dra. Nise Yamaguchi', 'CRM89012SP', 'Oncologia', 480.00, 'nise.yamaguchi@hospital.com', 'PedroLov'),
+('Dr. Fábio Jatene', 'CRM90123SP', 'Cirurgia Cardiovascular', 700.00, 'fabio.jatene@hospital.com', '987RR'),
+('Dra. Mayana Zatz', 'CRM01234SP', 'Genética Médica', 520.00, 'mayana.zatz@hospital.com', 'ty&&7');
+
 
 INSERT INTO Consulta (id_paciente, id_medico, data_hora, status, modalidade, triagem_sintomas) VALUES 
 (1, 1, '2026-02-15 14:30:00', 'Confirmado',  'Pessoalmente', 'Dor no peito e cansaço excessivo'),
