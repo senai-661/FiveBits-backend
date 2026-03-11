@@ -9,6 +9,7 @@ class Medico {
     private crm: string;
     private especialidade: string;
     private valorConsulta: number;
+    private emailMedico: string;
     private senhaMedico: string;
     private situacao: boolean = true;
 
@@ -18,6 +19,7 @@ class Medico {
         _crm: string,
         _especialidade: string,
         _valorConsulta: number,
+        _emailMedico: string,
         _senhaMedico: string,
         _situacao?: boolean // ? = Opcional
     ) {
@@ -25,6 +27,7 @@ class Medico {
         this.crm = _crm;
         this.especialidade = _especialidade;
         this.valorConsulta = _valorConsulta;
+        this.emailMedico = _emailMedico;
         this.senhaMedico = _senhaMedico;
         this.situacao = _situacao || false; // Opcional
     }
@@ -64,7 +67,12 @@ class Medico {
     public setValorConsulta(_valorConsulta: number): void {
         this.valorConsulta = _valorConsulta;
     }
-
+    public getEmailMedico(): string { 
+        return this.emailMedico;
+    }
+    public setEmailMedico(_emailMedico: string): void {
+        this.emailMedico = _emailMedico;
+    }
     public getSenhaMedico(): string {
         return this.senhaMedico;
     }
@@ -82,14 +90,15 @@ class Medico {
     // Insere um médico no banco de dados
   static async cadastrarMedico(Medico: MedicoDTO): Promise<boolean> {
         try {
-            const queryInsertMedico = `INSERT INTO Medico (nome_medico, crm, especialidade, valor_consulta, senha_medico) VALUES
-                                       ($1, $2, $3, $4, $5) RETURNING id_medico;`;
+            const queryInsertMedico = `INSERT INTO Medico (nome_medico, crm, especialidade, valor_consulta, email_medico, senha_medico) VALUES
+                                       ($1, $2, $3, $4, $5, $6) RETURNING id_medico;`;
 
             const respostaBD = await database.query(queryInsertMedico, [
                 Medico.nome.toUpperCase(),
                 Medico.crm,
                 Medico.especialidade,
                 Medico.valorConsulta,
+                Medico.emailMedico,
                 Medico.senhaMedico
             ]);
 
@@ -119,6 +128,7 @@ class Medico {
                     medicoBD.crm,
                     medicoBD.especialidade,
                     medicoBD.valor_consulta,
+                    medicoBD.email_medico,
                     medicoBD.senha_medico,
                     medicoBD.situacao
                 );
@@ -146,6 +156,7 @@ class Medico {
                 respostaBD.rows[0].crm,
                 respostaBD.rows[0].especialidade,
                 respostaBD.rows[0].valor_consulta,
+		        respostaBD.rows[0].email_medico,
                 respostaBD.rows[0].senha_medico,
                 respostaBD.rows[0].situacao
             );
