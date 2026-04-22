@@ -157,10 +157,10 @@ class Paciente {
             const novoPaciente: Paciente = new Paciente(
                 respostaBD.rows[0].nome_paciente,
                 respostaBD.rows[0].cpf,
-                respostaBD.rows[0].email,
-                respostaBD.rows[0].telefone,
-                respostaBD.rows[0].senha,
+                respostaBD.rows[0].email_paciente,
+                respostaBD.rows[0].senha_paciente,
                 respostaBD.rows[0].data_nascimento.toISOString().split('T')[0],
+                respostaBD.rows[0].telefone,
                 respostaBD.rows[0].situacao
             );
 
@@ -173,6 +173,52 @@ class Paciente {
             return null;
         }
     }
+
+   
+static async atualizarPaciente(paciente: Paciente): Promise<boolean> {
+    let conexao: any;
+
+    try {
+        conexao = await database.connect(); 
+
+        const sql = `
+            UPDATE paciente 
+            SET 
+                nome_paciente = $1, 
+                cpf = $2, 
+                email_paciente = $3, 
+                senha_paciente = $4, 
+                data_nascimento = $5, 
+                telefone = $6, 
+                situacao = $7
+            WHERE id_paciente = $8
+        `;
+
+        const valores = [
+            paciente.getNome(),
+            paciente.getCpf(),
+            paciente.getEmail(),
+            paciente.getSenha(),
+            paciente.getDataNascimento(),
+            paciente.getTelefone() || null, // Garante NULL no banco se estiver vazio
+            paciente.getSituacao() !== undefined ? paciente.getSituacao() : true,
+            paciente.getIdPaciente()
+        ];
+
+        const result = await conexao.query(sql, valores);
+
+        // Verifica se alguma linha foi afetada (se o ID existia)
+        return result.rowCount > 0;
+
+    } catch (error) {
+        console.error(`[MODEL ERROR]: Falha ao atualizar paciente no banco: ${error}`);
+        throw error; // Repassa o erro para o Controller tratar no try/catch de lá
+    } finally {
+        if (conexao) {
+            conexao.release();
+        }
+    }
+}
 }
 
 export default Paciente;
