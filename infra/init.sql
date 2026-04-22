@@ -1,64 +1,129 @@
+-- ==========================================
+-- 1. LIMPEZA DO BANCO DE DADOS (DROPS)
+-- A ordem deve respeitar as dependências (tabelas com FKs primeiro)
+-- ==========================================
+DROP TABLE IF EXISTS Consulta;
+DROP TABLE IF EXISTS Usuario;
+DROP TABLE IF EXISTS Medico;
+DROP TABLE IF EXISTS Paciente;
+
+
+-- ==========================================
+-- 2. CRIAÇÃO DAS TABELAS (DDL)
+-- ==========================================
+
+-- Tabela Paciente (Sem email/senha, focado apenas em dados pessoais)
 CREATE TABLE Paciente (
     id_paciente INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    nome_paciente VARCHAR(50) NOT NULL,
-    cpf VARCHAR(11) UNIQUE NOT NULL,
-    email_paciente VARCHAR(100) UNIQUE NOT NULL,
-	telefone VARCHAR (20),
-    senha_paciente VARCHAR(255) NOT NULL, 
-   	data_nascimento DATE NOT NULL,
+    nome VARCHAR(50) NOT NULL,
+    cpf CHAR(11) UNIQUE NOT NULL, 
+    telefone VARCHAR(20),
+    data_nascimento DATE NOT NULL,
     situacao BOOLEAN NOT NULL DEFAULT TRUE
 );
 
+-- Tabela Medico (Sem email/senha, focado apenas em dados profissionais)
 CREATE TABLE Medico(
- 	id_medico INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    nome_medico VARCHAR(50) NOT NULL,
+    id_medico INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nome VARCHAR(50) NOT NULL,
     crm VARCHAR(13) UNIQUE NOT NULL,
     especialidade VARCHAR(100) NOT NULL,
-    valor_consulta DECIMAL (6,2) NOT NULL,
-    email_medico VARCHAR(100)  NOT NULL,
-	senha_medico VARCHAR (255) NOT NULL,
+    valor_consulta DECIMAL(6,2) NOT NULL,
     situacao BOOLEAN NOT NULL DEFAULT TRUE
 );
 
+-- Tabela Usuario (Centraliza a autenticação e autorização)
+CREATE TABLE Usuario (
+    id_usuario INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    senha VARCHAR(255) NOT NULL,
+    role VARCHAR(20) NOT NULL CHECK (role IN ('ADMIN', 'MEDICO', 'PACIENTE')),
+    id_medico INTEGER,
+    id_paciente INTEGER,
+    situacao BOOLEAN NOT NULL DEFAULT TRUE,
+    FOREIGN KEY (id_medico) REFERENCES Medico (id_medico),
+    FOREIGN KEY (id_paciente) REFERENCES Paciente (id_paciente),
+    -- Restrição para garantir que um usuário não seja médico e paciente ao mesmo tempo
+    CHECK (
+        (role = 'ADMIN' AND id_medico IS NULL AND id_paciente IS NULL) OR
+        (role = 'MEDICO' AND id_medico IS NOT NULL AND id_paciente IS NULL) OR
+        (role = 'PACIENTE' AND id_paciente IS NOT NULL AND id_medico IS NULL)
+    )
+);
+
+-- Tabela Consulta 
 CREATE TABLE Consulta (
     id_consulta INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_paciente INTEGER NOT NULL,
     id_medico INTEGER NOT NULL,
-    data_hora TIMESTAMP,
-    status VARCHAR(50) DEFAULT 'Confirmado',
-    modalidade VARCHAR(30) DEFAULT 'Pessoalmente',
+    data_hora TIMESTAMP NOT NULL,
+    status VARCHAR(20) DEFAULT 'Confirmado' CHECK (status IN ('Pendente', 'Confirmado', 'Cancelado', 'Concluido')),
+    modalidade VARCHAR(30) DEFAULT 'Pessoalmente' CHECK (modalidade IN ('Pessoalmente', 'Telemedicina')),
     triagem_sintomas VARCHAR(100) NOT NULL,
-	FOREIGN KEY (id_paciente) REFERENCES Paciente (id_paciente),
-	FOREIGN KEY (id_medico) REFERENCES Medico (id_medico),
-    situacao BOOLEAN NOT NULL DEFAULT TRUE
+    situacao BOOLEAN NOT NULL DEFAULT TRUE,
+    FOREIGN KEY (id_paciente) REFERENCES Paciente (id_paciente),
+    FOREIGN KEY (id_medico) REFERENCES Medico (id_medico)
 );
 
-INSERT INTO Paciente (nome_paciente, cpf, email_paciente, telefone, senha_paciente, data_nascimento) VALUES 
-('Ana Beatriz Silva', '12345678901', 'ana.beatriz@gmail.com', '11984521736', '$hoje12', '1990-05-15'),
-('Carlos Eduardo Souza', '23456789012', 'carlos.edu@outlook.com', '21972635481', '$Livia@25', '1985-10-20'),
-('Mariana Luz Ferreira', '34567890123', 'mari.luz@yahoo.com.br', '31991827364', '$hamburguer', '1992-03-12'),
-('Ricardo Alves Pereira', '45678901234', 'ricardo.ap@hotmail.com', '41988223344', '$hot', '1978-07-25'),
-('Juliana Costa Moraes', '56789012345', 'ju.moraes@gmail.com', '51981112233', '$dog22', '2000-12-05'),
-('Fernando Gomes Lima', '67890123456', 'fernando.g@uol.com.br', '61995556677', 'Pituco98', '1988-01-30'),
-('Patrícia Rocha Santos', '78901234567', 'paty.rocha@gmail.com', '71987778899', 'Romeu00', '1995-09-18'),
-('Lucas Mendes Vieira', '89012345678', 'lucas.mendes@icloud.com', '81992223311', 'Devsio', '1982-06-14'),
-('Beatriz Antunes Melo', '90123456789', 'antunes.bea@gmail.com', '91983334422', 'loinv44', '1991-11-22'),
-('Gustavo Henrique Paz', '01234567890', 'gustavo.paz@outlook.com', '48994445566', '09livoii', '1975-04-10');
 
+-- ==========================================
+-- 3. INSERÇÃO DOS DADOS (DML)
+-- ==========================================
 
-INSERT INTO Medico (nome_medico, crm, especialidade, valor_consulta, email_medico, senha_medico) VALUES 
-('Dr. Roberto Kalil', 'CRM12345SP', 'Cardiologia', 450.00, 'roberto.kalil@hospital.com', 'jioL3'),
-('Dra. Ludhmila Hajjar', 'CRM23456SP', 'Cardiologia', 500.00,'ludhmila.hajjar@hospital.com', 'Sesi89'),
-('Dr. Drauzio Varella', 'CRM34567SP', 'Clínica Geral', 350.00,'drauzio.varella@hospital.com', 'Senai987'),
-('Dra. Angelita Gama', 'CRM45678SP', 'Coloproctologia', 600.00, 'angelita.gama@hospital.com', 'criativaSenha'),
-('Dr. Miguel Srougi', 'CRM56789SP', 'Urologia', 550.00, 'miguel.srougi@hospital.com', 'eitaLiv'),
-('Dra. Margareth Dalcolmo', 'CRM67890RJ', 'Pneumologia', 400.00, 'margareth.dalcolmo@hospital.com', 'ezoN2'),
-('Dr. Paulo Niemeyer', 'CRM78901RJ', 'Neurocirurgia', 850.00, 'paulo.niemeyer@hospital.com', 'Jaoliv'),
-('Dra. Nise Yamaguchi', 'CRM89012SP', 'Oncologia', 480.00, 'nise.yamaguchi@hospital.com', 'PedroLov'),
-('Dr. Fábio Jatene', 'CRM90123SP', 'Cirurgia Cardiovascular', 700.00, 'fabio.jatene@hospital.com', '987RR'),
-('Dra. Mayana Zatz', 'CRM01234SP', 'Genética Médica', 520.00, 'mayana.zatz@hospital.com', 'ty&&7');
+-- Inserindo os Pacientes
+INSERT INTO Paciente (nome, cpf, telefone, data_nascimento) VALUES 
+('Ana Beatriz Silva', '12345678901', '11984521736', '1990-05-15'),
+('Carlos Eduardo Souza', '23456789012', '21972635481', '1985-10-20'),
+('Mariana Luz Ferreira', '34567890123', '31991827364', '1992-03-12'),
+('Ricardo Alves Pereira', '45678901234', '41988223344', '1978-07-25'),
+('Juliana Costa Moraes', '56789012345', '51981112233', '2000-12-05'),
+('Fernando Gomes Lima', '67890123456', '61995556677', '1988-01-30'),
+('Patrícia Rocha Santos', '78901234567', '71987778899', '1995-09-18'),
+('Lucas Mendes Vieira', '89012345678', '81992223311', '1982-06-14'),
+('Beatriz Antunes Melo', '90123456789', '91983334422', '1991-11-22'),
+('Gustavo Henrique Paz', '01234567890', '48994445566', '1975-04-10');
 
+-- Inserindo os Médicos
+INSERT INTO Medico (nome, crm, especialidade, valor_consulta) VALUES 
+('Dr. Roberto Kalil', 'CRM12345SP', 'Cardiologia', 450.00),
+('Dra. Ludhmila Hajjar', 'CRM23456SP', 'Cardiologia', 500.00),
+('Dr. Drauzio Varella', 'CRM34567SP', 'Clínica Geral', 350.00),
+('Dra. Angelita Gama', 'CRM45678SP', 'Coloproctologia', 600.00),
+('Dr. Miguel Srougi', 'CRM56789SP', 'Urologia', 550.00),
+('Dra. Margareth Dalcolmo', 'CRM67890RJ', 'Pneumologia', 400.00),
+('Dr. Paulo Niemeyer', 'CRM78901RJ', 'Neurocirurgia', 850.00),
+('Dra. Nise Yamaguchi', 'CRM89012SP', 'Oncologia', 480.00),
+('Dr. Fábio Jatene', 'CRM90123SP', 'Cirurgia Cardiovascular', 700.00),
+('Dra. Mayana Zatz', 'CRM01234SP', 'Genética Médica', 520.00);
 
+-- Inserindo os Usuários de acesso (vinculando com as tabelas acima)
+-- Para os Pacientes (IDs de 1 a 10)
+INSERT INTO Usuario (email, senha, role, id_paciente) VALUES
+('ana.beatriz@gmail.com', '$hoje12', 'PACIENTE', 1),
+('carlos.edu@outlook.com', '$Livia@25', 'PACIENTE', 2),
+('mari.luz@yahoo.com.br', '$hamburguer', 'PACIENTE', 3),
+('ricardo.ap@hotmail.com', '$hot', 'PACIENTE', 4),
+('ju.moraes@gmail.com', '$dog22', 'PACIENTE', 5),
+('fernando.g@uol.com.br', 'Pituco98', 'PACIENTE', 6),
+('paty.rocha@gmail.com', 'Romeu00', 'PACIENTE', 7),
+('lucas.mendes@icloud.com', 'Devsio', 'PACIENTE', 8),
+('antunes.bea@gmail.com', 'loinv44', 'PACIENTE', 9),
+('gustavo.paz@outlook.com', '09livoii', 'PACIENTE', 10);
+
+-- Para os Médicos (IDs de 1 a 10)
+INSERT INTO Usuario (email, senha, role, id_medico) VALUES
+('roberto.kalil@hospital.com', 'jioL3', 'MEDICO', 1),
+('ludhmila.hajjar@hospital.com', 'Sesi89', 'MEDICO', 2),
+('drauzio.varella@hospital.com', 'Senai987', 'MEDICO', 3),
+('angelita.gama@hospital.com', 'criativaSenha', 'MEDICO', 4),
+('miguel.srougi@hospital.com', 'eitaLiv', 'MEDICO', 5),
+('margareth.dalcolmo@hospital.com', 'ezoN2', 'MEDICO', 6),
+('paulo.niemeyer@hospital.com', 'Jaoliv', 'MEDICO', 7),
+('nise.yamaguchi@hospital.com', 'PedroLov', 'MEDICO', 8),
+('fabio.jatene@hospital.com', '987RR', 'MEDICO', 9),
+('mayana.zatz@hospital.com', 'ty&&7', 'MEDICO', 10);
+
+-- Inserindo as Consultas
 INSERT INTO Consulta (id_paciente, id_medico, data_hora, status, modalidade, triagem_sintomas) VALUES 
 (1, 1, '2026-02-15 14:30:00', 'Confirmado',  'Pessoalmente', 'Dor no peito e cansaço excessivo'),
 (2, 2, '2026-02-16 09:20:00', 'Pendente', 'Pessoalmente', 'Palpitação e tontura'),
