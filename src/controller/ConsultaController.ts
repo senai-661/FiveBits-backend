@@ -101,8 +101,8 @@ class ConsultaController extends Consulta {
     // "Promise<Response>" indica que este método sempre retorna uma resposta HTTP ao final
     static async remover(req: Request, res: Response): Promise<Response> {
         try {
-            // Lê o parâmetro "id" da URL e converte para número inteiro
-            const idConsulta = parseInt(req.params.id as string);
+            // Lê o parâmetro "idConsulta" da URL e converte para número inteiro
+            const idConsulta = parseInt(req.params.idConsulta as string);
 
             // Chama o método do model para remover (logicamente) a consulta com o ID informado
             const result = await Consulta.deletarConsulta(idConsulta);
@@ -148,7 +148,7 @@ class ConsultaController extends Consulta {
             triagemSintomas,
             idPaciente,
             idMedico,
-            status ?? 'Agendada',
+            status ?? 'Pendente',
             situacao ?? true
         );
         consulta.setIdConsulta(idConsulta);

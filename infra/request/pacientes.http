@@ -8,7 +8,7 @@ Content-Type: application/json
 
 {
   "nome": "João Silva",
-  "cpf": "98765432100",
+  "cpf": "98715432100",
   "telefone": "(11) 98765-4321",
   "email": "joao.silva@example.com",
   "senha": "SenhaForte123",
@@ -17,4 +17,21 @@ Content-Type: application/json
 
 ### Testar buscar paciente por ID
 GET http://localhost:3333/api/pacientes/1
+Accept: application/json
+
+### Testar atualizar paciente
+PUT http://localhost:3333/api/pacientes/1
+Content-Type: application/json
+
+{
+  "nome": "João Silva Alterado",
+  "cpf": "98765532100",
+  "telefone": "(11) 98765-4321",
+  "email": "joao.silva@example.com",
+  "senha": "SenhaForte123",
+  "dataNascimento": "1991-08-10"
+}
+
+### Testar deletar paciente
+DELETE http://localhost:3333/api/pacientes/1
 Accept: application/json
