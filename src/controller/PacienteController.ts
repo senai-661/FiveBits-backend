@@ -91,7 +91,6 @@ class PacienteController extends Paciente {
         }
     }
 
-<<<<<<< enzo_cassao
     /**
      * Método para remover um medico do banco de dados
      * 
@@ -101,12 +100,12 @@ class PacienteController extends Paciente {
      */
     static async remover(req: Request, res: Response): Promise<Response> {
         try {
-            const idPaciente = parseInt(req.params.id as string);
+            const idPaciente = parseInt(req.params.idPaciente as string);
 
             const result = await Paciente.deletarPaciente(idPaciente);
 
             if(result) {
-                return res.status(200).json({ mensagem: 'Paciente não encontrado para exclusão'});
+                return res.status(200).json({ mensagem: 'Paciente removido com sucesso.'});
             } else {
                 return res.status(404).json({ mensagem: 'Paciente não encontrado para exclusão.'});
             }
@@ -115,7 +114,6 @@ class PacienteController extends Paciente {
             return res.status(500).json({ mensagem: 'Erro ao remover Paciente.' });
         }
     }
-=======
     static async atualizar(req: Request, res: Response): Promise<Response> {
     try {
         // 1. Validação do ID
@@ -127,12 +125,12 @@ class PacienteController extends Paciente {
             });
         }
 
-        const { nome, cpf, email, telefone, senha, dataNascimento, situacao }: PacienteDTO = req.body;
+        const { nome, cpf, telefone, dataNascimento, situacao }: PacienteDTO = req.body;
 
         // 3. Validação de Regra de Negócio: Campos obrigatórios conforme o DTO
-        if (!nome || !cpf || !email || !senha || !dataNascimento) {
+        if (!nome || !cpf || !dataNascimento) {
             return res.status(400).json({ 
-                mensagem: "Nome, CPF, Email, Senha e Data de Nascimento são obrigatórios." 
+                mensagem: "Nome, CPF e Data de Nascimento são obrigatórios." 
             });
         }
 
@@ -141,8 +139,6 @@ class PacienteController extends Paciente {
         const paciente = new Paciente(
             nome,
             cpf,
-            email,
-            senha,
             new Date(dataNascimento),
             telefone, // Opcional
             situacao ?? true // Default caso não seja enviado
@@ -159,7 +155,10 @@ class PacienteController extends Paciente {
             return res.status(200).json({ mensagem: "Paciente atualizado com sucesso." });
         }
 
-        return res.status(404).json({ mensagem: "Paciente não encontrado para atualização." });
+        // Verifica se o paciente não foi encontrado ou se o CPF já existe
+        return res.status(400).json({ 
+            mensagem: "Falha na atualização: CPF já existe em outro paciente ou paciente não encontrado." 
+        });
 
     } catch (error) {
         
@@ -170,7 +169,6 @@ class PacienteController extends Paciente {
         });
     }
 }
->>>>>>> features
 }
 
 export default PacienteController;

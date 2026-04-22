@@ -91,7 +91,6 @@ class MedicoController extends Medico {
         }
     }
 
-<<<<<<< enzo_cassao
     /**
     * Método para remover um medico do banco de dados
     * 
@@ -101,8 +100,8 @@ class MedicoController extends Medico {
     */
     static async remover(req: Request, res: Response): Promise<Response> {
         try {
-            // Lê o parâmetro "id" da URL e converte para número inteiro
-            const idMedico = parseInt(req.params.id as string);
+            // Lê o parâmetro "idMedico" da URL e converte para número inteiro
+            const idMedico = parseInt(req.params.idMedico as string);
 
             // Chama o método do model para remover (logicamente) o Medico com o ID informado
             const result = await Medico.deletarMedico(idMedico);
@@ -120,7 +119,6 @@ class MedicoController extends Medico {
             return res.status(500).json({ mensagem: 'Erro ao remover o Medico.' });
         }
     }
-=======
     static async atualizar(req: Request, res: Response): Promise<Response> {
     try {
        
@@ -132,12 +130,12 @@ class MedicoController extends Medico {
             });
         }
 
-        const { nome, crm, especialidade, valorConsulta, emailMedico, senhaMedico, situacao }: MedicoDTO = req.body;
+        const { nome, crm, especialidade, valorConsulta, situacao }: MedicoDTO = req.body;
 
         
-        if (!nome || !crm || !especialidade || !valorConsulta || !emailMedico || !senhaMedico) {
+        if (!nome || !crm || !especialidade || !valorConsulta) {
             return res.status(400).json({ 
-                mensagem: "Todos os campos (nome, crm, especialidade, valor, email e senha) são obrigatórios." 
+                mensagem: "Todos os campos (nome, crm, especialidade, valorConsulta) são obrigatórios." 
             });
         }
 
@@ -147,8 +145,6 @@ class MedicoController extends Medico {
             crm,
             especialidade,
             valorConsulta,
-            emailMedico,
-            senhaMedico,
             situacao ?? true
         );
         medico.setIdMedico(idMedico);
@@ -170,7 +166,6 @@ class MedicoController extends Medico {
         });
     }
 }
->>>>>>> features
 }
 
 export default MedicoController

@@ -91,7 +91,6 @@ class ConsultaController extends Consulta {
         }
     }
 
-<<<<<<< enzo_cassao
     /**
      * Remove uma consulta.
      * @param req Objeto de requisição HTTP com o ID da consulta a ser removido.
@@ -102,8 +101,8 @@ class ConsultaController extends Consulta {
     // "Promise<Response>" indica que este método sempre retorna uma resposta HTTP ao final
     static async remover(req: Request, res: Response): Promise<Response> {
         try {
-            // Lê o parâmetro "id" da URL e converte para número inteiro
-            const idConsulta = parseInt(req.params.id as string);
+            // Lê o parâmetro "idConsulta" da URL e converte para número inteiro
+            const idConsulta = parseInt(req.params.idConsulta as string);
 
             // Chama o método do model para remover (logicamente) a consulta com o ID informado
             const result = await Consulta.deletarConsulta(idConsulta);
@@ -121,7 +120,6 @@ class ConsultaController extends Consulta {
             return res.status(500).json({ mensagem: 'Erro ao remover Consulta.' });
         }
     }
-=======
     static async atualizar(req: Request, res: Response): Promise<Response> {
     try {
         // 1. Validação do ID da Consulta via URL
@@ -150,7 +148,7 @@ class ConsultaController extends Consulta {
             triagemSintomas,
             idPaciente,
             idMedico,
-            status ?? 'Agendada',
+            status ?? 'Pendente',
             situacao ?? true
         );
         consulta.setIdConsulta(idConsulta);
@@ -172,7 +170,6 @@ class ConsultaController extends Consulta {
         });
     }
 }
->>>>>>> features
 }
 
 export default ConsultaController;

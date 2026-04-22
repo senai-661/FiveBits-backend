@@ -18,3 +18,20 @@ Content-Type: application/json
 ### Testar buscar médico por ID
 GET http://localhost:3333/api/medicos/1
 Accept: application/json
+
+### Testar atualizar médico
+PUT http://localhost:3333/api/medicos/1
+Content-Type: application/json
+
+{
+  "nome": "Dra. Maria Oliveira Alterada",
+  "especialidade": "Cardiologia",
+  "crm": "12345-SP",
+  "valorConsulta": 500.00,
+  "emailMedico": "maria.oliveira@example.com",
+  "senhaMedico": "SenhaForte123"
+}
+
+### Testar deletar médico
+DELETE http://localhost:3333/api/medicos/1
+Accept: application/json
