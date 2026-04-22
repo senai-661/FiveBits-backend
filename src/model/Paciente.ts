@@ -93,7 +93,7 @@ class Paciente {
     //Insere um paciente no banco de dados
     static async cadastrarPaciente(paciente: PacienteDTO): Promise<boolean> {
         try {
-            const queryInsertPaciente = `INSERT INTO Paciente (nome_paciente, cpf, email, telefone, senha_paciente, data_nascimento)
+            const queryInsertPaciente = `INSERT INTO Paciente (nome_paciente, cpf, email_paciente, telefone, senha_paciente, data_nascimento)
                                 VALUES ($1, $2, $3, $4, $5, $6)
                                 RETURNING id_paciente;`;
 
@@ -157,10 +157,10 @@ class Paciente {
             const novoPaciente: Paciente = new Paciente(
                 respostaBD.rows[0].nome_paciente,
                 respostaBD.rows[0].cpf,
-                respostaBD.rows[0].email,
-                respostaBD.rows[0].telefone,
-                respostaBD.rows[0].senha,
+                respostaBD.rows[0].email_paciente,
+                respostaBD.rows[0].senha_paciente,
                 respostaBD.rows[0].data_nascimento.toISOString().split('T')[0],
+                respostaBD.rows[0].telefone,
                 respostaBD.rows[0].situacao
             );
 
@@ -174,6 +174,7 @@ class Paciente {
         }
     }
 
+<<<<<<< enzo_cassao
     static async deletarPaciente(idPaciente: number): Promise<boolean> {
         try {
             const queryDeletePaciente = `UPDATE Paciente SET situacao = FALSE WHERE id_medico = $1`;
@@ -191,6 +192,53 @@ class Paciente {
             return false;
         }
     }
+=======
+   
+static async atualizarPaciente(paciente: Paciente): Promise<boolean> {
+    let conexao: any;
+
+    try {
+        conexao = await database.connect(); 
+
+        const sql = `
+            UPDATE paciente 
+            SET 
+                nome_paciente = $1, 
+                cpf = $2, 
+                email_paciente = $3, 
+                senha_paciente = $4, 
+                data_nascimento = $5, 
+                telefone = $6, 
+                situacao = $7
+            WHERE id_paciente = $8
+        `;
+
+        const valores = [
+            paciente.getNome(),
+            paciente.getCpf(),
+            paciente.getEmail(),
+            paciente.getSenha(),
+            paciente.getDataNascimento(),
+            paciente.getTelefone() || null, // Garante NULL no banco se estiver vazio
+            paciente.getSituacao() !== undefined ? paciente.getSituacao() : true,
+            paciente.getIdPaciente()
+        ];
+
+        const result = await conexao.query(sql, valores);
+
+        // Verifica se alguma linha foi afetada (se o ID existia)
+        return result.rowCount > 0;
+
+    } catch (error) {
+        console.error(`[MODEL ERROR]: Falha ao atualizar paciente no banco: ${error}`);
+        throw error; // Repassa o erro para o Controller tratar no try/catch de lá
+    } finally {
+        if (conexao) {
+            conexao.release();
+        }
+    }
+}
+>>>>>>> features
 }
 
 export default Paciente;
