@@ -39,5 +39,7 @@ router.get("/api/consultas", ConsultaController.todos);
 router.post("/api/consultas", ConsultaController.novo);
 // Retorna a consulta pelo ID
 router.get("/api/consultas/:idConsulta", ConsultaController.consulta)
+// Deleta uma consulta pelo ID
+router.delete("/api/consultas/:idConsulta", ConsultaController.remover)
 
 export { router };

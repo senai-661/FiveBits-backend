@@ -90,6 +90,37 @@ class ConsultaController extends Consulta {
             return res.status(500).json({ mensagem: "Não foi possível obter informação de consulta" });
         }
     }
+
+    /**
+     * Remove uma consulta.
+     * @param req Objeto de requisição HTTP com o ID da consulta a ser removido.
+     * @param res Objeto de resposta HTTP.
+     * @returns Mensagem de sucesso ou erro em formato JSON.
+     */
+    // Método que recebe um ID pela URL e realiza a remoção lógica da consulta no banco
+    // "Promise<Response>" indica que este método sempre retorna uma resposta HTTP ao final
+    static async remover(req: Request, res: Response): Promise<Response> {
+        try {
+            // Lê o parâmetro "id" da URL e converte para número inteiro
+            // Exemplo de URL: DELETE /Consulta/3  →  idConsulta = 3
+            const idConsulta = parseInt(req.params.id as string);
+
+            // Chama o método do model para remover (logicamente) a consulta com o ID informado
+            const result = await Consulta.deletarConsulta(idConsulta);
+
+            if (result) {
+                // Retorna mensagem de sucesso com status HTTP 200 se a remoção funcionou
+                return res.status(200).json({ mensagem: 'Consulta removida com sucesso.' });
+            } else {
+                // Retorna status HTTP 404 (Not Found) se o Consulta não foi encontrado ou já estava inativo
+                return res.status(404).json({ mensagem: 'Consulta não encontrada para exclusão.' });
+            }
+        } catch (error) {
+            // Exibe o erro no console e retorna status HTTP 500 em caso de exceção
+            console.log(`Erro ao remover Consulta: ${error}`)
+            return res.status(500).json({ mensagem: 'Erro ao remover Consulta.' });
+        }
+    }
 }
 
 export default ConsultaController;
