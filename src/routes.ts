@@ -25,6 +25,8 @@ router.get("/api/pacientes", PacienteController.todos);
 router.post("/api/pacientes", PacienteController.novo);
 // Retorna o paciente pelo ID
 router.get("/api/pacientes/:idPaciente", PacienteController.paciente);
+// Deleta o paciente pelo ID
+router.delete("/api/pacientes/:idPaciente", PacienteController.remover);
 
 // Retorna a lista com todos os médicos (Ordem Alfabética)
 router.get("/api/medicos", MedicoController.todos);

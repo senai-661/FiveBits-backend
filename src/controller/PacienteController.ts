@@ -90,6 +90,30 @@ class PacienteController extends Paciente {
             return res.status(500).json({ mensagem: "Não foi possível obter informação de Paciente" });
         }
     }
+
+    /**
+     * Método para remover um medico do banco de dados
+     * 
+     * @param req Objeto de requisição HTTP com o ID do medico a ser o removido.
+     * @param res Objeto de resposta HTTP.
+     * @returns Mensagem de sucesso ou erro em formato JSON.
+     */
+    static async remover(req: Request, res: Response): Promise<Response> {
+        try {
+            const idPaciente = parseInt(req.params.id as string);
+
+            const result = await Paciente.deletarPaciente(idPaciente);
+
+            if(result) {
+                return res.status(200).json({ mensagem: 'Paciente não encontrado para exclusão'});
+            } else {
+                return res.status(404).json({ mensagem: 'Paciente não encontrado para exclusão.'});
+            }
+        } catch (error) {
+            console.error(`Erro ao remover o Paciente. ${error}`);
+            return res.status(500).json({ mensagem: 'Erro ao remover Paciente.' });
+        }
+    }
 }
 
 export default PacienteController;
