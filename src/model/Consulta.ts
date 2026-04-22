@@ -18,10 +18,14 @@ class Consulta {
         _dataHora: Date,
         _modalidade: string,
         _triagemSintomas: string,
+        _idPaciente?: number, // ? = Opcional
+        _idMedico?: number, // ? = Opcional
         _status?: string, // ? = Opcional
         _situacao?: boolean // ? = Opcional
     ) {
         this.dataHora = _dataHora;
+        this.idPaciente = _idPaciente || 0; // Opcional
+        this.idMedico = _idMedico || 0; // Opcional
         this.status = _status || ""; // Opcional
         this.modalidade = _modalidade;
         this.triagemSintomas = _triagemSintomas;
@@ -95,8 +99,8 @@ class Consulta {
                 Consulta.idPaciente,
                 Consulta.idMedico,
                 Consulta.dataHora,
-                Consulta.modalidade,
                 Consulta.status,
+                Consulta.modalidade,
                 Consulta.triagemSintomas
             ]);
 
@@ -122,16 +126,16 @@ class Consulta {
 
             respostaBD.rows.forEach((consultaBD) => {
                 const novo = new Consulta(
-                    consultaBD.data_hora.toISOString().replace('T', ' ').replace('.000Z', ''),
+                    consultaBD.data_hora,
                     consultaBD.modalidade,
                     consultaBD.triagem_sintomas,
+                    consultaBD.id_paciente,
+                    consultaBD.id_medico,
                     consultaBD.status,
                     consultaBD.situacao
                 );
 
                 novo.setIdConsulta(consultaBD.id_consulta);
-                novo.setIdPaciente(consultaBD.id_paciente);
-                novo.setIdMedico(consultaBD.id_medico);
                 listaConsultas.push(novo);
             });
 
@@ -145,21 +149,21 @@ class Consulta {
     // Lista uma consulta pelo ID
     static async listarConsulta(idConsulta: number): Promise<Consulta | null> {
         try {
-            const querySelectConsulta = `SELECT * FROM Consulta WHERE id_Consulta=$1 AND situacao=TRUE;`;
+            const querySelectConsulta = `SELECT * FROM Consulta WHERE id_consulta=$1 AND situacao=TRUE;`;
 
             const respostaBD = await database.query(querySelectConsulta, [idConsulta]);
 
             const novaConsulta: Consulta = new Consulta(
-                respostaBD.rows[0].data_hora.toISOString().replace('T', ' ').replace('.000Z', ''),
+                respostaBD.rows[0].data_hora,
                 respostaBD.rows[0].modalidade,
                 respostaBD.rows[0].triagem_sintomas,
+                respostaBD.rows[0].id_paciente,
+                respostaBD.rows[0].id_medico,
                 respostaBD.rows[0].status,
                 respostaBD.rows[0].situacao
             );
 
             novaConsulta.setIdConsulta(respostaBD.rows[0].id_consulta);
-            novaConsulta.setIdMedico(respostaBD.rows[0].id_medico);
-            novaConsulta.setIdPaciente(respostaBD.rows[0].id_paciente);
 
             return novaConsulta;
         } catch (error) {
@@ -167,6 +171,67 @@ class Consulta {
             return null;
         }
     }
+
+    static async deletarConsulta(idConsulta: number): Promise<boolean> {
+        try {
+            const queryDeleteConsulta = `UPDATE Consulta SET situacao = FALSE WHERE id_consulta = $1`;
+
+            const respostaBD = await database.query(queryDeleteConsulta, [idConsulta]);
+
+            if(respostaBD.rowCount != 0) {
+                console.info(`Consulta removida com sucesso`);
+                return true;
+            }
+
+            return false;
+        } catch (error) {
+            console.error(`Erro ao remover Consulta do banco de dados. ${error}`);
+            return false;
+        }
+    }
+    static async atualizarConsulta(consulta: Consulta): Promise<boolean> {
+    let conexao: any;
+
+    try {
+        conexao = await database.connect(); 
+
+        const sql = `
+            UPDATE Consulta 
+            SET 
+                id_paciente = $1, 
+                id_medico = $2, 
+                data_hora = $3, 
+                status = $4, 
+                modalidade = $5, 
+                triagem_sintomas = $6, 
+                situacao = $7
+            WHERE id_consulta = $8
+        `;
+
+        const valores = [
+            consulta.getIdPaciente() || null, // Se não enviado, mantém nulo ou valor anterior
+            consulta.getIdMedico() || null,
+            consulta.getDataHora(),
+            consulta.getStatus(),
+            consulta.getModalidade(),
+            consulta.getTriagemSintomas(),
+            consulta.getSituacao() !== undefined ? consulta.getSituacao() : true,
+            consulta.getIdConsulta()
+        ];
+
+        const result = await conexao.query(sql, valores);
+
+        return result.rowCount > 0;
+
+    } catch (error) {
+        console.error(`[MODEL ERROR]: Falha ao atualizar consulta no banco: ${error}`);
+        throw error;
+    } finally {
+        if (conexao) {
+            conexao.release();
+        }
+    }
+}
 }
 
 export default Consulta;

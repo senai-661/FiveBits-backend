@@ -2,12 +2,12 @@
  * Interface DTO para transferência de dados do Consulta
  */
 export interface ConsultaDTO {
-    idConsulta: number;
-    idPaciente?: number; // Opcional
-    idMedico?: number; // Opcional
+    idConsulta?: number;
+    idPaciente: number;
+    idMedico: number;
     dataHora: Date;
-    status?: string; // Opcional
-    modalidade: string;
+    status?: 'Pendente' | 'Confirmado' | 'Cancelado' | 'Concluido';
+    modalidade?: 'Pessoalmente' | 'Telemedicina';
     triagemSintomas: string;
-    situacao?: boolean; // Opcional
-}
+    situacao?: boolean;
+}

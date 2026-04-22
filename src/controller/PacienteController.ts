@@ -90,6 +90,85 @@ class PacienteController extends Paciente {
             return res.status(500).json({ mensagem: "Não foi possível obter informação de Paciente" });
         }
     }
+
+    /**
+     * Método para remover um medico do banco de dados
+     * 
+     * @param req Objeto de requisição HTTP com o ID do medico a ser o removido.
+     * @param res Objeto de resposta HTTP.
+     * @returns Mensagem de sucesso ou erro em formato JSON.
+     */
+    static async remover(req: Request, res: Response): Promise<Response> {
+        try {
+            const idPaciente = parseInt(req.params.idPaciente as string);
+
+            const result = await Paciente.deletarPaciente(idPaciente);
+
+            if(result) {
+                return res.status(200).json({ mensagem: 'Paciente removido com sucesso.'});
+            } else {
+                return res.status(404).json({ mensagem: 'Paciente não encontrado para exclusão.'});
+            }
+        } catch (error) {
+            console.error(`Erro ao remover o Paciente. ${error}`);
+            return res.status(500).json({ mensagem: 'Erro ao remover Paciente.' });
+        }
+    }
+    static async atualizar(req: Request, res: Response): Promise<Response> {
+    try {
+        // 1. Validação do ID
+        const idPaciente = Number(req.params.idPaciente ?? req.params.id);
+
+        if (isNaN(idPaciente)) {
+            return res.status(400).json({ 
+                mensagem: "ID inválido. A atualização requer um identificador numérico." 
+            });
+        }
+
+        const { nome, cpf, telefone, dataNascimento, situacao }: PacienteDTO = req.body;
+
+        // 3. Validação de Regra de Negócio: Campos obrigatórios conforme o DTO
+        if (!nome || !cpf || !dataNascimento) {
+            return res.status(400).json({ 
+                mensagem: "Nome, CPF e Data de Nascimento são obrigatórios." 
+            });
+        }
+
+        // 4. Instanciação e Configuração:
+        // Criamos o objeto Paciente (ajuste o nome da classe conforme seu projeto)
+        const paciente = new Paciente(
+            nome,
+            cpf,
+            new Date(dataNascimento),
+            telefone, // Opcional
+            situacao ?? true // Default caso não seja enviado
+        );
+        
+        // Atribuindo o ID para garantir que o Update saiba quem alterar
+        paciente.setIdPaciente(idPaciente); 
+
+        // 5. Persistência
+        const result = await Paciente.atualizarPaciente(paciente);
+
+   
+        if (result) {
+            return res.status(200).json({ mensagem: "Paciente atualizado com sucesso." });
+        }
+
+        // Verifica se o paciente não foi encontrado ou se o CPF já existe
+        return res.status(400).json({ 
+            mensagem: "Falha na atualização: CPF já existe em outro paciente ou paciente não encontrado." 
+        });
+
+    } catch (error) {
+        
+        console.error(`[ERRO NA ATUALIZAÇÃO DE PACIENTE]: ${error}`);
+        
+        return res.status(500).json({ 
+            mensagem: "Erro interno ao atualizar os dados do paciente." 
+        });
+    }
+}
 }
 
 export default PacienteController;

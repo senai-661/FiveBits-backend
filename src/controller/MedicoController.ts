@@ -90,6 +90,82 @@ class MedicoController extends Medico {
             return res.status(500).json({ mensagem: "Não foi possível obter informação de Medico" });
         }
     }
+
+    /**
+    * Método para remover um medico do banco de dados
+    * 
+    * @param req Objeto de requisição HTTP com o ID do medico a ser removido.
+    * @param res Objeto de resposta HTTP.
+    * @returns Mensagem de sucesso ou erro em formato JSON.
+    */
+    static async remover(req: Request, res: Response): Promise<Response> {
+        try {
+            // Lê o parâmetro "idMedico" da URL e converte para número inteiro
+            const idMedico = parseInt(req.params.idMedico as string);
+
+            // Chama o método do model para remover (logicamente) o Medico com o ID informado
+            const result = await Medico.deletarMedico(idMedico);
+
+            // Verifica o retorno do model: true = remoção bem-sucedida, false = falha
+            if (result) {
+                return res.status(200).json({ mensagem: 'Medico removido com sucesso.' });
+            } else {
+                // Retorna status HTTP 404 (Not Found) se o Medico não foi encontrado ou já estava inativo
+                return res.status(404).json({ mensagem: 'Medico não encontrado para exclusão.' });
+            }
+        } catch (error) {
+            // Exibe o erro no console e retorna status HTTP 500 em caso de exceção
+            console.error("Erro ao remover o Medico: ", error);
+            return res.status(500).json({ mensagem: 'Erro ao remover o Medico.' });
+        }
+    }
+    static async atualizar(req: Request, res: Response): Promise<Response> {
+    try {
+       
+        const idMedico = Number(req.params.idMedico ?? req.params.id);
+
+        if (isNaN(idMedico)) {
+            return res.status(400).json({ 
+                mensagem: "ID inválido. A atualização requer um identificador numérico." 
+            });
+        }
+
+        const { nome, crm, especialidade, valorConsulta, situacao }: MedicoDTO = req.body;
+
+        
+        if (!nome || !crm || !especialidade || !valorConsulta) {
+            return res.status(400).json({ 
+                mensagem: "Todos os campos (nome, crm, especialidade, valorConsulta) são obrigatórios." 
+            });
+        }
+
+      
+        const medico = new Medico(
+            nome,
+            crm,
+            especialidade,
+            valorConsulta,
+            situacao ?? true
+        );
+        medico.setIdMedico(idMedico);
+
+        
+        const result = await Medico.atualizarMedico(medico);
+
+       
+        if (result) {
+            return res.status(200).json({ mensagem: "Médico atualizado com sucesso." });
+        }
+
+        return res.status(404).json({ mensagem: "Médico não encontrado para atualização." });
+
+    } catch (error) {
+        console.error(`[ERRO NA ATUALIZAÇÃO DE MÉDICO]: ${error}`);
+        return res.status(500).json({ 
+            mensagem: "Erro interno ao atualizar os dados do médico." 
+        });
+    }
+}
 }
 
 export default MedicoController
