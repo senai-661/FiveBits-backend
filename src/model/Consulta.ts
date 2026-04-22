@@ -171,6 +171,26 @@ class Consulta {
             return null;
         }
     }
+<<<<<<< enzo_cassao
+
+    static async deletarConsulta(idConsulta: number): Promise<boolean> {
+        try {
+            const queryDeleteConsulta = `UPDATE Consulta SET situacao = FALSE WHERE id_consulta = $1`;
+
+            const respostaBD = await database.query(queryDeleteConsulta, [idConsulta]);
+
+            if(respostaBD.rowCount != 0) {
+                console.info(`Consulta removida com sucesso`);
+                return true;
+            }
+
+            return false;
+        } catch (error) {
+            console.error(`Erro ao remover Consulta do banco de dados. ${error}`);
+            return false;
+        }
+    }
+=======
     static async atualizarConsulta(consulta: Consulta): Promise<boolean> {
     let conexao: any;
 
@@ -214,6 +234,7 @@ class Consulta {
         }
     }
 }
+>>>>>>> features
 }
 
 export default Consulta;

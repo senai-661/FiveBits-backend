@@ -174,6 +174,25 @@ class Paciente {
         }
     }
 
+<<<<<<< enzo_cassao
+    static async deletarPaciente(idPaciente: number): Promise<boolean> {
+        try {
+            const queryDeletePaciente = `UPDATE Paciente SET situacao = FALSE WHERE id_medico = $1`;
+
+            const respostaBD = await database.query(queryDeletePaciente, [idPaciente]);
+            
+            if(respostaBD.rowCount != 0) {
+                console.info(`Paciente removido com sucesso`);
+                return true;
+            }
+
+            return false;
+        } catch (error) {
+            console.error(`Erro ao remover Paciente do banco de dados. ${error}`);
+            return false;
+        }
+    }
+=======
    
 static async atualizarPaciente(paciente: Paciente): Promise<boolean> {
     let conexao: any;
@@ -219,6 +238,7 @@ static async atualizarPaciente(paciente: Paciente): Promise<boolean> {
         }
     }
 }
+>>>>>>> features
 }
 
 export default Paciente;
