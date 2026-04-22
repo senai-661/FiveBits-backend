@@ -90,6 +90,57 @@ class ConsultaController extends Consulta {
             return res.status(500).json({ mensagem: "Não foi possível obter informação de consulta" });
         }
     }
+
+    static async atualizar(req: Request, res: Response): Promise<Response> {
+    try {
+        // 1. Validação do ID da Consulta via URL
+        const idConsulta = Number(req.params.idConsulta ?? req.params.id);
+
+        if (isNaN(idConsulta)) {
+            return res.status(400).json({ 
+                mensagem: "ID da consulta inválido." 
+            });
+        }
+
+        // 2. Desestruturação baseada no ConsultaDTO
+        const { idPaciente, idMedico, dataHora, status, modalidade, triagemSintomas, situacao }: ConsultaDTO = req.body;
+
+        // 3. Validação de Campos Obrigatórios (da regra de negócio)
+        if (!dataHora || !modalidade || !triagemSintomas) {
+            return res.status(400).json({ 
+                mensagem: "Data/Hora, modalidade e triagem são obrigatórios para atualizar a consulta." 
+            });
+        }
+
+        // 4. Instanciação
+        const consulta = new Consulta(
+            dataHora ? new Date(dataHora) : new Date(),
+            modalidade,
+            triagemSintomas,
+            idPaciente,
+            idMedico,
+            status ?? 'Agendada',
+            situacao ?? true
+        );
+        consulta.setIdConsulta(idConsulta);
+
+        // 5. Persistência
+        const result = await Consulta.atualizarConsulta(consulta);
+
+        // 6. Resposta
+        if (result) {
+            return res.status(200).json({ mensagem: "Consulta atualizada com sucesso." });
+        }
+
+        return res.status(404).json({ mensagem: "Consulta não encontrada para atualização." });
+
+    } catch (error) {
+        console.error(`[ERRO NA ATUALIZAÇÃO DE CONSULTA]: ${error}`);
+        return res.status(500).json({ 
+            mensagem: "Erro interno ao atualizar os dados da consulta." 
+        });
+    }
+}
 }
 
 export default ConsultaController;

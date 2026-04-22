@@ -43,5 +43,7 @@ router.get("/api/consultas", ConsultaController.todos);
 router.post("/api/consultas", ConsultaController.novo);
 // Retorna a consulta pelo ID
 router.get("/api/consultas/:idConsulta", ConsultaController.consulta)
+// Atualiza uma consulta pelo ID
+router.put("/api/consultas/:idConsulta", ConsultaController.atualizar);
 
 export { router };
