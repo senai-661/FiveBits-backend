@@ -17,3 +17,19 @@ Content-Type: application/json
 ### Testar buscar consulta por ID
 GET http://localhost:3333/api/consultas/1
 Accept: application/json
+
+### Testar atualizar consulta
+PUT http://localhost:3333/api/consultas/1
+Content-Type: application/json
+
+{
+  "idPaciente": 1,
+  "idMedico": 1,
+  "dataHora": "2026-05-10T15:00:00",
+  "modalidade": "Teleconsulta",
+  "triagemSintomas": "Consulta de rotina - Alterada"
+}
+
+### Testar deletar consulta
+DELETE http://localhost:3333/api/consultas/1
+Accept: application/json
