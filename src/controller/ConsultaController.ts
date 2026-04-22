@@ -102,7 +102,6 @@ class ConsultaController extends Consulta {
     static async remover(req: Request, res: Response): Promise<Response> {
         try {
             // Lê o parâmetro "id" da URL e converte para número inteiro
-            // Exemplo de URL: DELETE /Consulta/3  →  idConsulta = 3
             const idConsulta = parseInt(req.params.id as string);
 
             // Chama o método do model para remover (logicamente) a consulta com o ID informado
