@@ -93,7 +93,7 @@ class Paciente {
     //Insere um paciente no banco de dados
     static async cadastrarPaciente(paciente: PacienteDTO): Promise<boolean> {
         try {
-            const queryInsertPaciente = `INSERT INTO Paciente (nome_paciente, cpf, email, telefone, senha_paciente, data_nascimento)
+            const queryInsertPaciente = `INSERT INTO Paciente (nome_paciente, cpf, email_paciente, telefone, senha_paciente, data_nascimento)
                                 VALUES ($1, $2, $3, $4, $5, $6)
                                 RETURNING id_paciente;`;
 
