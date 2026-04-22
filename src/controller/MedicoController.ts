@@ -90,6 +90,56 @@ class MedicoController extends Medico {
             return res.status(500).json({ mensagem: "Não foi possível obter informação de Medico" });
         }
     }
+
+    static async atualizar(req: Request, res: Response): Promise<Response> {
+    try {
+       
+        const idMedico = Number(req.params.idMedico ?? req.params.id);
+
+        if (isNaN(idMedico)) {
+            return res.status(400).json({ 
+                mensagem: "ID inválido. A atualização requer um identificador numérico." 
+            });
+        }
+
+        const { nome, crm, especialidade, valorConsulta, emailMedico, senhaMedico, situacao }: MedicoDTO = req.body;
+
+        
+        if (!nome || !crm || !especialidade || !valorConsulta || !emailMedico || !senhaMedico) {
+            return res.status(400).json({ 
+                mensagem: "Todos os campos (nome, crm, especialidade, valor, email e senha) são obrigatórios." 
+            });
+        }
+
+      
+        const medico = new Medico(
+            nome,
+            crm,
+            especialidade,
+            valorConsulta,
+            emailMedico,
+            senhaMedico,
+            situacao ?? true
+        );
+        medico.setIdMedico(idMedico);
+
+        
+        const result = await Medico.atualizarMedico(medico);
+
+       
+        if (result) {
+            return res.status(200).json({ mensagem: "Médico atualizado com sucesso." });
+        }
+
+        return res.status(404).json({ mensagem: "Médico não encontrado para atualização." });
+
+    } catch (error) {
+        console.error(`[ERRO NA ATUALIZAÇÃO DE MÉDICO]: ${error}`);
+        return res.status(500).json({ 
+            mensagem: "Erro interno ao atualizar os dados do médico." 
+        });
+    }
+}
 }
 
 export default MedicoController

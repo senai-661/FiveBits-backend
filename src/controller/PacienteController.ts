@@ -94,7 +94,7 @@ class PacienteController extends Paciente {
     static async atualizar(req: Request, res: Response): Promise<Response> {
     try {
         // 1. Validação do ID
-        const idPaciente = Number(req.params.idPaciente);
+        const idPaciente = Number(req.params.idPaciente ?? req.params.id);
 
         if (isNaN(idPaciente)) {
             return res.status(400).json({ 

@@ -170,6 +170,51 @@ class Medico {
             return null;
         }
     }
+
+    static async atualizarMedico(medico: Medico): Promise<boolean> {
+    let conexao: any;
+
+    try {
+        conexao = await database.connect(); 
+
+        const sql = `
+            UPDATE Medico 
+            SET 
+                nome_medico = $1, 
+                crm = $2, 
+                especialidade = $3, 
+                valor_consulta = $4, 
+                email_medico = $5, 
+                senha_medico = $6, 
+                situacao = $7
+            WHERE id_medico = $8
+        `;
+
+        const valores = [
+            medico.getNome(),
+            medico.getCrm(),
+            medico.getEspecialidade(),
+            medico.getValorConsulta(),
+            medico.getEmailMedico(),
+            medico.getSenhaMedico(),
+            medico.getSituacao() !== undefined ? medico.getSituacao() : true,
+            medico.getIdMedico()
+        ];
+
+        const result = await conexao.query(sql, valores);
+
+        // Retorna true se o registro foi encontrado e alterado
+        return result.rowCount > 0;
+
+    } catch (error) {
+        console.error(`[MODEL ERROR]: Falha ao atualizar médico: ${error}`);
+        throw error;
+    } finally {
+        if (conexao) {
+            conexao.release();
+        }
+    }
+}
 }
 
 export default Medico;
