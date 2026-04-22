@@ -148,7 +148,7 @@ class ConsultaController extends Consulta {
             triagemSintomas,
             idPaciente,
             idMedico,
-            status ?? 'Agendada',
+            status ?? 'Pendente',
             situacao ?? true
         );
         consulta.setIdConsulta(idConsulta);

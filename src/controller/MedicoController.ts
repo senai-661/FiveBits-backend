@@ -130,12 +130,12 @@ class MedicoController extends Medico {
             });
         }
 
-        const { nome, crm, especialidade, valorConsulta, emailMedico, senhaMedico, situacao }: MedicoDTO = req.body;
+        const { nome, crm, especialidade, valorConsulta, situacao }: MedicoDTO = req.body;
 
         
-        if (!nome || !crm || !especialidade || !valorConsulta || !emailMedico || !senhaMedico) {
+        if (!nome || !crm || !especialidade || !valorConsulta) {
             return res.status(400).json({ 
-                mensagem: "Todos os campos (nome, crm, especialidade, valor, email e senha) são obrigatórios." 
+                mensagem: "Todos os campos (nome, crm, especialidade, valorConsulta) são obrigatórios." 
             });
         }
 
@@ -145,8 +145,6 @@ class MedicoController extends Medico {
             crm,
             especialidade,
             valorConsulta,
-            emailMedico,
-            senhaMedico,
             situacao ?? true
         );
         medico.setIdMedico(idMedico);
