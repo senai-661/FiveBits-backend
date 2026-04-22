@@ -90,6 +90,61 @@ class PacienteController extends Paciente {
             return res.status(500).json({ mensagem: "Não foi possível obter informação de Paciente" });
         }
     }
+
+    static async atualizar(req: Request, res: Response): Promise<Response> {
+    try {
+        // 1. Validação do ID
+        const idPaciente = Number(req.params.idPaciente ?? req.params.id);
+
+        if (isNaN(idPaciente)) {
+            return res.status(400).json({ 
+                mensagem: "ID inválido. A atualização requer um identificador numérico." 
+            });
+        }
+
+        const { nome, cpf, email, telefone, senha, dataNascimento, situacao }: PacienteDTO = req.body;
+
+        // 3. Validação de Regra de Negócio: Campos obrigatórios conforme o DTO
+        if (!nome || !cpf || !email || !senha || !dataNascimento) {
+            return res.status(400).json({ 
+                mensagem: "Nome, CPF, Email, Senha e Data de Nascimento são obrigatórios." 
+            });
+        }
+
+        // 4. Instanciação e Configuração:
+        // Criamos o objeto Paciente (ajuste o nome da classe conforme seu projeto)
+        const paciente = new Paciente(
+            nome,
+            cpf,
+            email,
+            senha,
+            new Date(dataNascimento),
+            telefone, // Opcional
+            situacao ?? true // Default caso não seja enviado
+        );
+        
+        // Atribuindo o ID para garantir que o Update saiba quem alterar
+        paciente.setIdPaciente(idPaciente); 
+
+        // 5. Persistência
+        const result = await Paciente.atualizarPaciente(paciente);
+
+   
+        if (result) {
+            return res.status(200).json({ mensagem: "Paciente atualizado com sucesso." });
+        }
+
+        return res.status(404).json({ mensagem: "Paciente não encontrado para atualização." });
+
+    } catch (error) {
+        
+        console.error(`[ERRO NA ATUALIZAÇÃO DE PACIENTE]: ${error}`);
+        
+        return res.status(500).json({ 
+            mensagem: "Erro interno ao atualizar os dados do paciente." 
+        });
+    }
+}
 }
 
 export default PacienteController;

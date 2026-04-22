@@ -25,6 +25,9 @@ router.get("/api/pacientes", PacienteController.todos);
 router.post("/api/pacientes", PacienteController.novo);
 // Retorna o paciente pelo ID
 router.get("/api/pacientes/:idPaciente", PacienteController.paciente);
+// Atualiza um paciente pelo ID
+router.put("/api/pacientes/:idPaciente", PacienteController.atualizar);
+
 
 // Retorna a lista com todos os médicos (Ordem Alfabética)
 router.get("/api/medicos", MedicoController.todos);
@@ -32,6 +35,7 @@ router.get("/api/medicos", MedicoController.todos);
 router.post("/api/medicos", MedicoController.novo);
 // Retorna o médico pelo ID
 router.get("/api/medicos/:idMedico", MedicoController.medico);
+router.put("/api/medicos/:idMedico", MedicoController.atualizar);
 
 // Retorna a lista com todas as consultas
 router.get("/api/consultas", ConsultaController.todos);
@@ -39,5 +43,7 @@ router.get("/api/consultas", ConsultaController.todos);
 router.post("/api/consultas", ConsultaController.novo);
 // Retorna a consulta pelo ID
 router.get("/api/consultas/:idConsulta", ConsultaController.consulta)
+// Atualiza uma consulta pelo ID
+router.put("/api/consultas/:idConsulta", ConsultaController.atualizar);
 
 export { router };
