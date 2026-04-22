@@ -25,14 +25,11 @@ router.get("/api/pacientes", PacienteController.todos);
 router.post("/api/pacientes", PacienteController.novo);
 // Retorna o paciente pelo ID
 router.get("/api/pacientes/:idPaciente", PacienteController.paciente);
-<<<<<<< enzo_cassao
 // Deleta o paciente pelo ID
 router.delete("/api/pacientes/:idPaciente", PacienteController.remover);
-=======
 // Atualiza um paciente pelo ID
 router.put("/api/pacientes/:idPaciente", PacienteController.atualizar);
 
->>>>>>> features
 
 // Retorna a lista com todos os médicos (Ordem Alfabética)
 router.get("/api/medicos", MedicoController.todos);
@@ -40,12 +37,9 @@ router.get("/api/medicos", MedicoController.todos);
 router.post("/api/medicos", MedicoController.novo);
 // Retorna o médico pelo ID
 router.get("/api/medicos/:idMedico", MedicoController.medico);
-<<<<<<< enzo_cassao
 // Deleta o médico pelo ID
-router.delete("/api/medicos/:idConsulta", MedicoController.remover)
-=======
+router.delete("/api/medicos/:idMedico", MedicoController.remover)
 router.put("/api/medicos/:idMedico", MedicoController.atualizar);
->>>>>>> features
 
 // Retorna a lista com todas as consultas
 router.get("/api/consultas", ConsultaController.todos);
@@ -53,12 +47,9 @@ router.get("/api/consultas", ConsultaController.todos);
 router.post("/api/consultas", ConsultaController.novo);
 // Retorna a consulta pelo ID
 router.get("/api/consultas/:idConsulta", ConsultaController.consulta)
-<<<<<<< enzo_cassao
 // Deleta uma consulta pelo ID
 router.delete("/api/consultas/:idConsulta", ConsultaController.remover)
-=======
 // Atualiza uma consulta pelo ID
 router.put("/api/consultas/:idConsulta", ConsultaController.atualizar);
->>>>>>> features
 
 export { router };
