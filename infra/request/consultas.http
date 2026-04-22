@@ -11,7 +11,8 @@ Content-Type: application/json
   "idMedico": 1,
   "dataHora": "2026-05-10T14:30:00",
   "modalidade": "Pessoalmente",
-  "triagemSintomas": "Consulta de rotina"
+  "triagemSintomas": "Consulta de rotina",
+  "status": "Confirmado"
 }
 
 ### Testar buscar consulta por ID
@@ -26,8 +27,9 @@ Content-Type: application/json
   "idPaciente": 1,
   "idMedico": 1,
   "dataHora": "2026-05-10T15:00:00",
-  "modalidade": "Teleconsulta",
-  "triagemSintomas": "Consulta de rotina - Alterada"
+  "modalidade": "Telemedicina",
+  "triagemSintomas": "Consulta de rotina - Alterada",
+  "status": "Confirmado"
 }
 
 ### Testar deletar consulta
