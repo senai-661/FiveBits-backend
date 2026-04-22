@@ -1,0 +1,19 @@
+### Testar lista de consultas
+GET http://localhost:3333/api/consultas
+Accept: application/json
+
+### Testar criar consulta
+POST http://localhost:3333/api/consultas
+Content-Type: application/json
+
+{
+  "idPaciente": 1,
+  "idMedico": 1,
+  "dataHora": "2026-05-10T14:30:00",
+  "modalidade": "Pessoalmente",
+  "triagemSintomas": "Consulta de rotina"
+}
+
+### Testar buscar consulta por ID
+GET http://localhost:3333/api/consultas/1
+Accept: application/json
