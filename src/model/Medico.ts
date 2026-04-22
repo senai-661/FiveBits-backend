@@ -9,8 +9,6 @@ class Medico {
     private crm: string;
     private especialidade: string;
     private valorConsulta: number;
-    private emailMedico: string;
-    private senhaMedico: string;
     private situacao: boolean = true;
 
     // Constructor da Classe Médico
@@ -19,16 +17,12 @@ class Medico {
         _crm: string,
         _especialidade: string,
         _valorConsulta: number,
-        _emailMedico: string,
-        _senhaMedico: string,
         _situacao?: boolean // ? = Opcional
     ) {
         this.nome = _nome;
         this.crm = _crm;
         this.especialidade = _especialidade;
         this.valorConsulta = _valorConsulta;
-        this.emailMedico = _emailMedico;
-        this.senhaMedico = _senhaMedico;
         this.situacao = _situacao || false; // Opcional
     }
 
@@ -67,18 +61,6 @@ class Medico {
     public setValorConsulta(_valorConsulta: number): void {
         this.valorConsulta = _valorConsulta;
     }
-    public getEmailMedico(): string { 
-        return this.emailMedico;
-    }
-    public setEmailMedico(_emailMedico: string): void {
-        this.emailMedico = _emailMedico;
-    }
-    public getSenhaMedico(): string {
-        return this.senhaMedico;
-    }
-    public setSenhaMedico(_senhaMedico: string): void {
-        this.senhaMedico = _senhaMedico;
-    }
 
     public getSituacao(): boolean {
         return this.situacao;
@@ -90,16 +72,14 @@ class Medico {
     // Insere um médico no banco de dados
   static async cadastrarMedico(Medico: MedicoDTO): Promise<boolean> {
         try {
-            const queryInsertMedico = `INSERT INTO Medico (nome_medico, crm, especialidade, valor_consulta, email_medico, senha_medico) VALUES
-                                       ($1, $2, $3, $4, $5, $6) RETURNING id_medico;`;
+            const queryInsertMedico = `INSERT INTO Medico (nome, crm, especialidade, valor_consulta) VALUES
+                                       ($1, $2, $3, $4) RETURNING id_medico;`;
 
             const respostaBD = await database.query(queryInsertMedico, [
                 Medico.nome.toUpperCase(),
                 Medico.crm,
                 Medico.especialidade,
-                Medico.valorConsulta,
-                Medico.emailMedico,
-                Medico.senhaMedico
+                Medico.valorConsulta
             ]);
 
             if (respostaBD.rows.length > 0) {
@@ -119,7 +99,7 @@ class Medico {
         try {
             let listaMedicos: Array<Medico> = [];
             // Regra da Sprint: Ordem Alfabética para entidades principais
-            const querySelectMedicos = `SELECT * FROM Medico WHERE situacao=TRUE ORDER BY nome_medico ASC;`;
+            const querySelectMedicos = `SELECT * FROM Medico WHERE situacao=TRUE ORDER BY nome ASC;`;
             const respostaBD = await database.query(querySelectMedicos);
 
             respostaBD.rows.forEach((medicoBD) => {
@@ -128,8 +108,6 @@ class Medico {
                     medicoBD.crm,
                     medicoBD.especialidade,
                     medicoBD.valor_consulta,
-                    medicoBD.email_medico,
-                    medicoBD.senha_medico,
                     medicoBD.situacao
                 );
 
@@ -152,12 +130,10 @@ class Medico {
             const respostaBD = await database.query(querySelectMedico, [idMedico]);
 
             const novoMedico: Medico = new Medico(
-                respostaBD.rows[0].nome_medico,
+                respostaBD.rows[0].nome,
                 respostaBD.rows[0].crm,
                 respostaBD.rows[0].especialidade,
                 respostaBD.rows[0].valor_consulta,
-		        respostaBD.rows[0].email_medico,
-                respostaBD.rows[0].senha_medico,
                 respostaBD.rows[0].situacao
             );
 
@@ -197,14 +173,12 @@ class Medico {
         const sql = `
             UPDATE Medico 
             SET 
-                nome_medico = $1, 
+                nome = $1, 
                 crm = $2, 
                 especialidade = $3, 
                 valor_consulta = $4, 
-                email_medico = $5, 
-                senha_medico = $6, 
-                situacao = $7
-            WHERE id_medico = $8
+                situacao = $5
+            WHERE id_medico = $6
         `;
 
         const valores = [
@@ -212,8 +186,6 @@ class Medico {
             medico.getCrm(),
             medico.getEspecialidade(),
             medico.getValorConsulta(),
-            medico.getEmailMedico(),
-            medico.getSenhaMedico(),
             medico.getSituacao() !== undefined ? medico.getSituacao() : true,
             medico.getIdMedico()
         ];

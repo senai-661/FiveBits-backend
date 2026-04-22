@@ -99,8 +99,8 @@ class Consulta {
                 Consulta.idPaciente,
                 Consulta.idMedico,
                 Consulta.dataHora,
-                Consulta.modalidade,
                 Consulta.status,
+                Consulta.modalidade,
                 Consulta.triagemSintomas
             ]);
 
@@ -126,16 +126,16 @@ class Consulta {
 
             respostaBD.rows.forEach((consultaBD) => {
                 const novo = new Consulta(
-                    consultaBD.data_hora.toISOString().replace('T', ' ').replace('.000Z', ''),
+                    consultaBD.data_hora,
                     consultaBD.modalidade,
                     consultaBD.triagem_sintomas,
+                    consultaBD.id_paciente,
+                    consultaBD.id_medico,
                     consultaBD.status,
                     consultaBD.situacao
                 );
 
                 novo.setIdConsulta(consultaBD.id_consulta);
-                novo.setIdPaciente(consultaBD.id_paciente);
-                novo.setIdMedico(consultaBD.id_medico);
                 listaConsultas.push(novo);
             });
 
@@ -154,16 +154,16 @@ class Consulta {
             const respostaBD = await database.query(querySelectConsulta, [idConsulta]);
 
             const novaConsulta: Consulta = new Consulta(
-                respostaBD.rows[0].data_hora.toISOString().replace('T', ' ').replace('.000Z', ''),
+                respostaBD.rows[0].data_hora,
                 respostaBD.rows[0].modalidade,
                 respostaBD.rows[0].triagem_sintomas,
+                respostaBD.rows[0].id_paciente,
+                respostaBD.rows[0].id_medico,
                 respostaBD.rows[0].status,
                 respostaBD.rows[0].situacao
             );
 
             novaConsulta.setIdConsulta(respostaBD.rows[0].id_consulta);
-            novaConsulta.setIdMedico(respostaBD.rows[0].id_medico);
-            novaConsulta.setIdPaciente(respostaBD.rows[0].id_paciente);
 
             return novaConsulta;
         } catch (error) {
