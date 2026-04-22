@@ -170,6 +170,24 @@ class Medico {
             return null;
         }
     }
+
+    static async deletarMedico(idMedico: number): Promise<boolean> {
+        try {
+            const queryDeleteMedico = `UPDATE Medico SET situacao = FALSE WHERE id_medico = $1`;
+
+            const respostaBD = await database.query(queryDeleteMedico, [idMedico]);
+
+            if(respostaBD.rowCount != 0) {
+                console.info(`Medico removido com sucesso`);
+                return true;
+            }
+
+            return false;
+        } catch (error) {
+            console.error(`Erro ao remover Medico do banco de dados. ${error}`);
+            return false;
+        }
+    }
 }
 
 export default Medico;

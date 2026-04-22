@@ -90,6 +90,35 @@ class MedicoController extends Medico {
             return res.status(500).json({ mensagem: "Não foi possível obter informação de Medico" });
         }
     }
+
+    /**
+    * Método para remover um medico do banco de dados
+    * 
+    * @param req Objeto de requisição HTTP com o ID do medico a ser removido.
+    * @param res Objeto de resposta HTTP.
+    * @returns Mensagem de sucesso ou erro em formato JSON.
+    */
+    static async remover(req: Request, res: Response): Promise<Response> {
+        try {
+            // Lê o parâmetro "id" da URL e converte para número inteiro
+            const idMedico = parseInt(req.params.id as string);
+
+            // Chama o método do model para remover (logicamente) o Medico com o ID informado
+            const result = await Medico.deletarMedico(idMedico);
+
+            // Verifica o retorno do model: true = remoção bem-sucedida, false = falha
+            if (result) {
+                return res.status(200).json({ mensagem: 'Medico removido com sucesso.' });
+            } else {
+                // Retorna status HTTP 404 (Not Found) se o Medico não foi encontrado ou já estava inativo
+                return res.status(404).json({ mensagem: 'Medico não encontrado para exclusão.' });
+            }
+        } catch (error) {
+            // Exibe o erro no console e retorna status HTTP 500 em caso de exceção
+            console.error("Erro ao remover o Medico: ", error);
+            return res.status(500).json({ mensagem: 'Erro ao remover o Medico.' });
+        }
+    }
 }
 
 export default MedicoController

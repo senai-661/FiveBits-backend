@@ -32,6 +32,8 @@ router.get("/api/medicos", MedicoController.todos);
 router.post("/api/medicos", MedicoController.novo);
 // Retorna o médico pelo ID
 router.get("/api/medicos/:idMedico", MedicoController.medico);
+// Deleta o médico pelo ID
+router.delete("/api/medicos/:idConsulta", MedicoController.remover)
 
 // Retorna a lista com todas as consultas
 router.get("/api/consultas", ConsultaController.todos);
