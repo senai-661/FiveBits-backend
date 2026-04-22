@@ -174,7 +174,6 @@ class Paciente {
         }
     }
 
-<<<<<<< enzo_cassao
     static async deletarPaciente(idPaciente: number): Promise<boolean> {
         try {
             const queryDeletePaciente = `UPDATE Paciente SET situacao = FALSE WHERE id_medico = $1`;
@@ -192,7 +191,6 @@ class Paciente {
             return false;
         }
     }
-=======
    
 static async atualizarPaciente(paciente: Paciente): Promise<boolean> {
     let conexao: any;
@@ -238,7 +236,6 @@ static async atualizarPaciente(paciente: Paciente): Promise<boolean> {
         }
     }
 }
->>>>>>> features
 }
 
 export default Paciente;

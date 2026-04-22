@@ -91,7 +91,6 @@ class ConsultaController extends Consulta {
         }
     }
 
-<<<<<<< enzo_cassao
     /**
      * Remove uma consulta.
      * @param req Objeto de requisição HTTP com o ID da consulta a ser removido.
@@ -121,7 +120,6 @@ class ConsultaController extends Consulta {
             return res.status(500).json({ mensagem: 'Erro ao remover Consulta.' });
         }
     }
-=======
     static async atualizar(req: Request, res: Response): Promise<Response> {
     try {
         // 1. Validação do ID da Consulta via URL
@@ -172,7 +170,6 @@ class ConsultaController extends Consulta {
         });
     }
 }
->>>>>>> features
 }
 
 export default ConsultaController;

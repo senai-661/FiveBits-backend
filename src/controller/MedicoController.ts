@@ -91,7 +91,6 @@ class MedicoController extends Medico {
         }
     }
 
-<<<<<<< enzo_cassao
     /**
     * Método para remover um medico do banco de dados
     * 
@@ -120,7 +119,6 @@ class MedicoController extends Medico {
             return res.status(500).json({ mensagem: 'Erro ao remover o Medico.' });
         }
     }
-=======
     static async atualizar(req: Request, res: Response): Promise<Response> {
     try {
        
@@ -170,7 +168,6 @@ class MedicoController extends Medico {
         });
     }
 }
->>>>>>> features
 }
 
 export default MedicoController

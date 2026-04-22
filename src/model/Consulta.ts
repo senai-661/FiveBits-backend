@@ -171,7 +171,6 @@ class Consulta {
             return null;
         }
     }
-<<<<<<< enzo_cassao
 
     static async deletarConsulta(idConsulta: number): Promise<boolean> {
         try {
@@ -190,7 +189,6 @@ class Consulta {
             return false;
         }
     }
-=======
     static async atualizarConsulta(consulta: Consulta): Promise<boolean> {
     let conexao: any;
 
@@ -234,7 +232,6 @@ class Consulta {
         }
     }
 }
->>>>>>> features
 }
 
 export default Consulta;

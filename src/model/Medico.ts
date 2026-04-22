@@ -171,7 +171,6 @@ class Medico {
         }
     }
 
-<<<<<<< enzo_cassao
     static async deletarMedico(idMedico: number): Promise<boolean> {
         try {
             const queryDeleteMedico = `UPDATE Medico SET situacao = FALSE WHERE id_medico = $1`;
@@ -189,7 +188,6 @@ class Medico {
             return false;
         }
     }
-=======
     static async atualizarMedico(medico: Medico): Promise<boolean> {
     let conexao: any;
 
@@ -234,7 +232,6 @@ class Medico {
         }
     }
 }
->>>>>>> features
 }
 
 export default Medico;
