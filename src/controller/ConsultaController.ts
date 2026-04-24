@@ -19,7 +19,7 @@ class ConsultaController extends Consulta {
     static async todos(req: Request, res: Response): Promise<Response> {
         try {
             // Chama o método listarConsultas da classe Consulta (Model)
-            const listarConsultas: Array<Consulta> | null = await Consulta.listarConsultas();
+            const listarConsultas: Array<ConsultaDTO> | null = await Consulta.listarConsultas();
 
             // Retorna status 200 (OK) e a lista de Consultas em formato JSON
             return res.status(200).json(listarConsultas);
@@ -132,7 +132,7 @@ class ConsultaController extends Consulta {
         }
 
         // 2. Desestruturação baseada no ConsultaDTO
-        const { idPaciente, idMedico, dataHora, status, modalidade, triagemSintomas, situacao }: ConsultaDTO = req.body;
+        const { paciente: { idPaciente }, medico: { idMedico }, dataHora, status, modalidade, triagemSintomas, situacao }: ConsultaDTO = req.body;
 
         // 3. Validação de Campos Obrigatórios (da regra de negócio)
         if (!dataHora || !modalidade || !triagemSintomas) {

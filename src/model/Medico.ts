@@ -104,7 +104,7 @@ class Medico {
 
             respostaBD.rows.forEach((medicoBD) => {
                 const novo = new Medico(
-                    medicoBD.nome_medico,
+                    medicoBD.nome,
                     medicoBD.crm,
                     medicoBD.especialidade,
                     medicoBD.valor_consulta,
