@@ -96,8 +96,8 @@ class Consulta {
                                            ($1, $2, $3, $4, $5, $6) RETURNING id_consulta;`;
 
             const respostaBD = await database.query(queryInsertConsulta, [
-                Consulta.idPaciente,
-                Consulta.idMedico,
+                Consulta.paciente.idPaciente,
+                Consulta.medico.idMedico,
                 Consulta.dataHora,
                 Consulta.status,
                 Consulta.modalidade,
@@ -116,26 +116,64 @@ class Consulta {
         }
     }
 
-    // Lista todas as Consultas
-    static async listarConsultas(): Promise<Array<Consulta> | null> {
+    // Lista todas as Consultas com dados relacionados de Paciente e Médico
+    static async listarConsultas(): Promise<Array<ConsultaDTO> | null> {
         try {
-            let listaConsultas: Array<Consulta> = [];
-            // Regra da Sprint: Ordem Alfabética para entidades principais
-            const querySelectConsulta = `SELECT * FROM Consulta WHERE situacao=TRUE;`;
+            let listaConsultas: Array<ConsultaDTO> = [];
+            const querySelectConsulta = `
+                SELECT
+                    c.id_consulta,
+                    c.data_hora,
+                    c.modalidade,
+                    c.triagem_sintomas,
+                    c.status,
+                    c.situacao,
+                    c.id_paciente,
+                    c.id_medico,
+                    p.nome AS paciente_nome,
+                    p.cpf AS paciente_cpf,
+                    p.telefone AS paciente_telefone,
+                    p.data_nascimento AS paciente_data_nascimento,
+                    p.situacao AS paciente_situacao,
+                    m.nome AS medico_nome,
+                    m.crm AS medico_crm,
+                    m.especialidade AS medico_especialidade,
+                    m.valor_consulta AS medico_valor_consulta,
+                    m.situacao AS medico_situacao
+                FROM Consulta c
+                JOIN Paciente p ON p.id_paciente = c.id_paciente AND p.situacao = TRUE
+                JOIN Medico m ON m.id_medico = c.id_medico AND m.situacao = TRUE
+                WHERE c.situacao = TRUE
+                ORDER BY p.nome ASC, m.nome ASC;
+            `;
             const respostaBD = await database.query(querySelectConsulta);
 
             respostaBD.rows.forEach((consultaBD) => {
-                const novo = new Consulta(
-                    consultaBD.data_hora,
-                    consultaBD.modalidade,
-                    consultaBD.triagem_sintomas,
-                    consultaBD.id_paciente,
-                    consultaBD.id_medico,
-                    consultaBD.status,
-                    consultaBD.situacao
-                );
+                const novo: ConsultaDTO = {
+                    idConsulta: consultaBD.id_consulta,
+                    dataHora: new Date(consultaBD.data_hora),
+                    status: consultaBD.status,
+                    modalidade: consultaBD.modalidade,
+                    triagemSintomas: consultaBD.triagem_sintomas,
+                    situacao: consultaBD.situacao,
+                    paciente: {
+                        idPaciente: consultaBD.id_paciente,
+                        nomePaciente: consultaBD.paciente_nome,
+                        cpf: consultaBD.paciente_cpf,
+                        telefone: consultaBD.paciente_telefone || "",
+                        dataNascimento: new Date(consultaBD.paciente_data_nascimento),
+                        situacao: consultaBD.paciente_situacao
+                    },
+                    medico: {
+                        idMedico: consultaBD.id_medico,
+                        nomeMedico: consultaBD.medico_nome,
+                        crm: consultaBD.medico_crm,
+                        especialidade: consultaBD.medico_especialidade,
+                        valorConsulta: Number(consultaBD.medico_valor_consulta),
+                        situacao: consultaBD.medico_situacao
+                    }
+                };
 
-                novo.setIdConsulta(consultaBD.id_consulta);
                 listaConsultas.push(novo);
             });
 
@@ -146,26 +184,69 @@ class Consulta {
         }
     }
 
-    // Lista uma consulta pelo ID
-    static async listarConsulta(idConsulta: number): Promise<Consulta | null> {
+    // Lista uma consulta pelo ID com dados relacionados de Paciente e Médico
+    static async listarConsulta(idConsulta: number): Promise<ConsultaDTO | null> {
         try {
-            const querySelectConsulta = `SELECT * FROM Consulta WHERE id_consulta=$1 AND situacao=TRUE;`;
+            const querySelectConsulta = `
+                SELECT 
+                    c.id_consulta,
+                    c.data_hora,
+                    c.modalidade,
+                    c.triagem_sintomas,
+                    c.status,
+                    c.situacao,
+                    c.id_paciente,
+                    c.id_medico,
+                    p.nome AS paciente_nome,
+                    p.cpf AS paciente_cpf,
+                    p.telefone AS paciente_telefone,
+                    p.data_nascimento AS paciente_data_nascimento,
+                    p.situacao AS paciente_situacao,
+                    m.nome AS medico_nome,
+                    m.crm AS medico_crm,
+                    m.especialidade AS medico_especialidade,
+                    m.valor_consulta AS medico_valor_consulta,
+                    m.situacao AS medico_situacao
+                FROM Consulta c
+                JOIN Paciente p ON p.id_paciente = c.id_paciente AND p.situacao = TRUE
+                JOIN Medico m ON m.id_medico = c.id_medico AND m.situacao = TRUE
+                WHERE c.id_consulta = $1 AND c.situacao = TRUE;
+            `;
 
             const respostaBD = await database.query(querySelectConsulta, [idConsulta]);
 
-            const novaConsulta: Consulta = new Consulta(
-                respostaBD.rows[0].data_hora,
-                respostaBD.rows[0].modalidade,
-                respostaBD.rows[0].triagem_sintomas,
-                respostaBD.rows[0].id_paciente,
-                respostaBD.rows[0].id_medico,
-                respostaBD.rows[0].status,
-                respostaBD.rows[0].situacao
-            );
+            if (respostaBD.rows.length === 0) {
+                return null;
+            }
 
-            novaConsulta.setIdConsulta(respostaBD.rows[0].id_consulta);
+            const consultaBD = respostaBD.rows[0];
 
-            return novaConsulta;
+            const consulta: ConsultaDTO = {
+                idConsulta: consultaBD.id_consulta,
+                dataHora: new Date(consultaBD.data_hora),
+                status: consultaBD.status,
+                modalidade: consultaBD.modalidade,
+                triagemSintomas: consultaBD.triagem_sintomas,
+                situacao: consultaBD.situacao,
+                paciente: {
+                    idPaciente: consultaBD.id_paciente,
+                    nomePaciente: consultaBD.paciente_nome,
+                    cpf: consultaBD.paciente_cpf,
+                    telefone: consultaBD.paciente_telefone || "",
+                    dataNascimento: new Date(consultaBD.paciente_data_nascimento),
+                    situacao: consultaBD.paciente_situacao
+                },
+                medico: {
+                    idMedico: consultaBD.id_medico,
+                    nomeMedico: consultaBD.medico_nome,
+                    crm: consultaBD.medico_crm,
+                    especialidade: consultaBD.medico_especialidade,
+                    valorConsulta: Number(consultaBD.medico_valor_consulta),
+                    situacao: consultaBD.medico_situacao
+                }
+            };
+
+            return consulta;
         } catch (error) {
             console.error(`Erro ao buscar consulta no banco de dados. ${error}`);
             return null;
