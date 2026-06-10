@@ -40,7 +40,7 @@ router.post("/api/medicos", Auth.verifyToken ,MedicoController.novo);
 router.get("/api/medicos/:idMedico", Auth.verifyToken ,MedicoController.medico);
 // Deleta o médico pelo ID
 router.delete("/api/medicos/:idMedico", Auth.verifyToken ,MedicoController.remover);
-
+// Atualiza um médico pelo ID
 router.put("/api/medicos/:idMedico", Auth.verifyToken ,MedicoController.atualizar);
 
 // Retorna a lista com todas as consultas
