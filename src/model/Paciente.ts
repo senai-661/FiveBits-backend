@@ -73,9 +73,7 @@ class Paciente {
     //Insere um paciente no banco de dados
     static async cadastrarPaciente(paciente: PacienteDTO): Promise<boolean> {
         try {
-            const queryInsertPaciente = `INSERT INTO Paciente (nome, cpf, telefone, data_nascimento)
-                                VALUES ($1, $2, $3, $4)
-                                RETURNING id_paciente;`;
+            const queryInsertPaciente = `CALL sp_cadastrar_paciente($1, $2, $3, $4);`;
 
             const respostaBD = await database.query(queryInsertPaciente, [
                 paciente.nome.toUpperCase(),
@@ -150,7 +148,7 @@ class Paciente {
 
     static async deletarPaciente(idPaciente: number): Promise<boolean> {
         try {
-            const queryDeletePaciente = `UPDATE Paciente SET situacao = FALSE WHERE id_paciente = $1`;
+            const queryDeletePaciente = `CALL sp_deletar_paciente($1);`;
 
             const respostaBD = await database.query(queryDeletePaciente, [idPaciente]);
             
@@ -174,8 +172,7 @@ static async atualizarPaciente(paciente: Paciente): Promise<boolean> {
 
         // 1. Verifica se o CPF já existe em outro paciente
         const checkCpfSql = `
-            SELECT id_paciente FROM paciente 
-            WHERE cpf = $1 AND id_paciente != $2
+        CALL sp_atualizar_paciente($1);
         `;
         
         const checkCpfResult = await conexao.query(checkCpfSql, [
