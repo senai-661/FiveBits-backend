@@ -72,8 +72,7 @@ class Medico {
     // Insere um médico no banco de dados
   static async cadastrarMedico(Medico: MedicoDTO): Promise<boolean> {
         try {
-            const queryInsertMedico = `INSERT INTO Medico (nome, crm, especialidade, valor_consulta) VALUES
-                                       ($1, $2, $3, $4) RETURNING id_medico;`;
+            const queryInsertMedico = `CALL sp_cadastrar_medico($1, $2, $3, $4);`;
 
             const respostaBD = await database.query(queryInsertMedico, [
                 Medico.nome.toUpperCase(),
@@ -149,7 +148,7 @@ class Medico {
 
     static async deletarMedico(idMedico: number): Promise<boolean> {
         try {
-            const queryDeleteMedico = `UPDATE Medico SET situacao = FALSE WHERE id_medico = $1`;
+            const queryDeleteMedico = `CALL sp_deletar_medico($1);`;
 
             const respostaBD = await database.query(queryDeleteMedico, [idMedico]);
 
@@ -170,16 +169,7 @@ class Medico {
     try {
         conexao = await database.connect(); 
 
-        const sql = `
-            UPDATE Medico 
-            SET 
-                nome = $1, 
-                crm = $2, 
-                especialidade = $3, 
-                valor_consulta = $4, 
-                situacao = $5
-            WHERE id_medico = $6
-        `;
+        const sql = `CALL sp_atualizar_medico($1, $2, $3, $4, $5);`;
 
         const valores = [
             medico.getNome(),
