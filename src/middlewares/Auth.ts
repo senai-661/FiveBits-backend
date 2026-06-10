@@ -45,16 +45,14 @@ export class Auth {
             return res.status(400).json({ message: 'Email e senha são obrigatórios' });
         }
 
-        // query para validar email e senha informados pelo cliente
+        // query para validar email e senha informados pelo cliente utilizando a view de autenticação
         const querySelectUser = `
         SELECT
-        u.id_usuario AS id,
-         COALESCE(m.nome, p.nome) AS nome,
-        u.email,
-        u.role
-        FROM Usuario u
-        LEFT JOIN Medico m ON u.id_medico = m.id_medico
-        LEFT JOIN Paciente p ON u.id_paciente = p.id_paciente
+            id,
+            nome,
+            email,
+            role
+        FROM vw_autenticacao
         WHERE email=$1 AND senha=$2;`;
 
         try {
