@@ -135,3 +135,7 @@ INSERT INTO Consulta (id_paciente, id_medico, data_hora, status, modalidade, tri
 (8, 8, '2026-02-22 19:00:00', 'Concluido', 'Pessoalmente', 'Acompanhamento de tratamento oncológico'),
 (9, 9, '2026-02-23 16:30:00', 'Confirmado', 'Pessoalmente', 'Avaliação pré-operatória cardiovascular'),
 (10, 10, '2026-02-24 11:30:00', 'Confirmado', 'Pessoalmente', 'Consulta de rotina genética');
+
+-- Inserindo o Admin
+INSERT INTO Usuario (email, senha, role) VALUES
+('admin@email.com', 'admin', 'ADMIN');

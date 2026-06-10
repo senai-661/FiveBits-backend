@@ -121,30 +121,9 @@ class Consulta {
         try {
             let listaConsultas: Array<ConsultaDTO> = [];
             const querySelectConsulta = `
-                SELECT
-                    c.id_consulta,
-                    c.data_hora,
-                    c.modalidade,
-                    c.triagem_sintomas,
-                    c.status,
-                    c.situacao,
-                    c.id_paciente,
-                    c.id_medico,
-                    p.nome AS paciente_nome,
-                    p.cpf AS paciente_cpf,
-                    p.telefone AS paciente_telefone,
-                    p.data_nascimento AS paciente_data_nascimento,
-                    p.situacao AS paciente_situacao,
-                    m.nome AS medico_nome,
-                    m.crm AS medico_crm,
-                    m.especialidade AS medico_especialidade,
-                    m.valor_consulta AS medico_valor_consulta,
-                    m.situacao AS medico_situacao
-                FROM Consulta c
-                JOIN Paciente p ON p.id_paciente = c.id_paciente AND p.situacao = TRUE
-                JOIN Medico m ON m.id_medico = c.id_medico AND m.situacao = TRUE
-                WHERE c.situacao = TRUE
-                ORDER BY p.nome ASC, m.nome ASC;
+                SELECT *
+                FROM vw_consultas_detalhes
+                ORDER BY paciente_nome ASC, medico_nome ASC;
             `;
             const respostaBD = await database.query(querySelectConsulta);
 
@@ -188,29 +167,9 @@ class Consulta {
     static async listarConsulta(idConsulta: number): Promise<ConsultaDTO | null> {
         try {
             const querySelectConsulta = `
-                SELECT 
-                    c.id_consulta,
-                    c.data_hora,
-                    c.modalidade,
-                    c.triagem_sintomas,
-                    c.status,
-                    c.situacao,
-                    c.id_paciente,
-                    c.id_medico,
-                    p.nome AS paciente_nome,
-                    p.cpf AS paciente_cpf,
-                    p.telefone AS paciente_telefone,
-                    p.data_nascimento AS paciente_data_nascimento,
-                    p.situacao AS paciente_situacao,
-                    m.nome AS medico_nome,
-                    m.crm AS medico_crm,
-                    m.especialidade AS medico_especialidade,
-                    m.valor_consulta AS medico_valor_consulta,
-                    m.situacao AS medico_situacao
-                FROM Consulta c
-                JOIN Paciente p ON p.id_paciente = c.id_paciente AND p.situacao = TRUE
-                JOIN Medico m ON m.id_medico = c.id_medico AND m.situacao = TRUE
-                WHERE c.id_consulta = $1 AND c.situacao = TRUE;
+                SELECT *
+                FROM vw_consultas_detalhes
+                WHERE id_consulta = $1;
             `;
 
             const respostaBD = await database.query(querySelectConsulta, [idConsulta]);
