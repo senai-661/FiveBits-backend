@@ -99,7 +99,7 @@ class Medico {
         try {
             let listaMedicos: Array<Medico> = [];
             // Regra da Sprint: Ordem Alfabética para entidades principais
-            const querySelectMedicos = `SELECT * FROM Medico WHERE situacao=TRUE ORDER BY nome ASC;`;
+            const querySelectMedicos = `SELECT * FROM vw_medicos ORDER BY nome ASC;`;
             const respostaBD = await database.query(querySelectMedicos);
 
             respostaBD.rows.forEach((medicoBD) => {
@@ -125,7 +125,7 @@ class Medico {
     // Lista um médico pelo ID
     static async listarMedico(idMedico: number): Promise<Medico | null> {
         try {
-            const querySelectMedico = `SELECT * FROM Medico WHERE id_medico=$1 AND situacao=TRUE;`;
+            const querySelectMedico = `SELECT * FROM vw_medicos WHERE id_medico=$1;`;
 
             const respostaBD = await database.query(querySelectMedico, [idMedico]);
 
