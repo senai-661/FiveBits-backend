@@ -172,15 +172,13 @@ static async atualizarPaciente(paciente: Paciente): Promise<boolean> {
 
         // 1. Verifica se o CPF já existe em outro paciente
         const checkCpfSql = `
-        CALL sp_atualizar_paciente($1, $2, $3, $4, $5);
+            SELECT id_paciente FROM paciente 
+            WHERE cpf = $1 AND id_paciente != $2
         `;
         
         const checkCpfResult = await conexao.query(checkCpfSql, [
-            paciente.getIdPaciente(),
-            paciente.getNome(),
             paciente.getCpf(),
-            paciente.getTelefone(),
-            paciente.getDataNascimento()
+            paciente.getIdPaciente()
         ]);
 
         // Se o CPF já existe em outro paciente, rejeita a atualização
@@ -190,16 +188,7 @@ static async atualizarPaciente(paciente: Paciente): Promise<boolean> {
         }
 
         // 2. Procede com a atualização se o CPF é válido
-        const sql = `
-            UPDATE paciente 
-            SET 
-                nome = $1, 
-                cpf = $2, 
-                data_nascimento = $3, 
-                telefone = $4, 
-                situacao = $5
-            WHERE id_paciente = $6
-        `;
+        const sql = `CALL sp_atualizar_paciente($1, $2, $3, $4, $5)`;
 
         const valores = [
             paciente.getNome(),
