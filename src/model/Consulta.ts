@@ -92,8 +92,7 @@ class Consulta {
     // Cadastra uma Consulta no banco de dados
     static async cadastrarConsulta(Consulta: ConsultaDTO): Promise<boolean> {
         try {
-            const queryInsertConsulta = `INSERT INTO Consulta (id_paciente, id_medico, data_hora, status, modalidade, triagem_sintomas) VALUES 
-                                           ($1, $2, $3, $4, $5, $6) RETURNING id_consulta;`;
+            const queryInsertConsulta = `CALL sp_agendar_consulta($1 ,$2, $3, $4,$5 ,$6);`;
 
             const respostaBD = await database.query(queryInsertConsulta, [
                 Consulta.paciente.idPaciente,
@@ -214,7 +213,7 @@ class Consulta {
 
     static async deletarConsulta(idConsulta: number): Promise<boolean> {
         try {
-            const queryDeleteConsulta = `UPDATE Consulta SET situacao = FALSE WHERE id_consulta = $1`;
+            const queryDeleteConsulta = `CALL sp_cancelar_consulta(p_id_consulta = $1);`;
 
             const respostaBD = await database.query(queryDeleteConsulta, [idConsulta]);
 
@@ -235,18 +234,7 @@ class Consulta {
     try {
         conexao = await database.connect(); 
 
-        const sql = `
-            UPDATE Consulta 
-            SET 
-                id_paciente = $1, 
-                id_medico = $2, 
-                data_hora = $3, 
-                status = $4, 
-                modalidade = $5, 
-                triagem_sintomas = $6, 
-                situacao = $7
-            WHERE id_consulta = $8
-        `;
+        const sql = `CALL sp_atualizar_consulta( $1, $2, $3, $4, $5, $6);`;
 
         const valores = [
             consulta.getIdPaciente() || null, // Se não enviado, mantém nulo ou valor anterior
