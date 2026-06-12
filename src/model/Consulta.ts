@@ -92,23 +92,23 @@ class Consulta {
     // Cadastra uma Consulta no banco de dados
     static async cadastrarConsulta(Consulta: ConsultaDTO): Promise<boolean> {
         try {
-            const queryInsertConsulta = `CALL sp_agendar_consulta($1 ,$2, $3, $4,$5 ,$6);`;
+            const queryInsertConsulta = `CALL sp_agendar_consulta($1, $2, $3, $4, $5, $6);`;
 
-            const respostaBD = await database.query(queryInsertConsulta, [
+            const valores = [
                 Consulta.paciente.idPaciente,
                 Consulta.medico.idMedico,
-                Consulta.dataHora,
-                Consulta.status,
+                // garante que seja timestamp compatível
+                Consulta.dataHora ? new Date(Consulta.dataHora) : null,
                 Consulta.modalidade,
-                Consulta.triagemSintomas
-            ]);
+                Consulta.triagemSintomas,
+                Consulta.status ?? 'Pendente'
+            ];
 
-            if (respostaBD.rows.length > 0) {
-                console.info(`Consulta agendada com sucesso. ID: ${respostaBD.rows[0].id_consulta}.`);
-                return true;
-            }
+            // A procedure lança exceções em caso de erro (FK, conflito, etc.).
+            await database.query(queryInsertConsulta, valores);
 
-            return false;
+            console.info(`Consulta agendada com sucesso.`);
+            return true;
         } catch (error) {
             console.error(`Erro na consulta ao banco de dados. ${error}`);
             return false;
@@ -234,17 +234,21 @@ class Consulta {
     try {
         conexao = await database.connect(); 
 
-        const sql = `CALL sp_atualizar_consulta( $1, $2, $3, $4, $5, $6);`;
+        const sql = `CALL sp_atualizar_consulta($1, $2, $3, $4, $5, $6);`;
 
         const valores = [
-            consulta.getIdPaciente() || null, // Se não enviado, mantém nulo ou valor anterior
+            // 1: id_consulta
+            consulta.getIdConsulta(),
+            // 2: id_medico (pode ser null para manter)
             consulta.getIdMedico() || null,
-            consulta.getDataHora(),
-            consulta.getStatus(),
-            consulta.getModalidade(),
-            consulta.getTriagemSintomas(),
-            consulta.getSituacao() !== undefined ? consulta.getSituacao() : true,
-            consulta.getIdConsulta()
+            // 3: status (pode ser null)
+            consulta.getStatus() || null,
+            // 4: data_hora (pode ser null)
+            consulta.getDataHora() || null,
+            // 5: modalidade (pode ser null)
+            consulta.getModalidade() || null,
+            // 6: triagem_sintomas (pode ser null)
+            consulta.getTriagemSintomas() || null
         ];
 
         const result = await conexao.query(sql, valores);

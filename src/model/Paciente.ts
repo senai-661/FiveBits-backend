@@ -73,20 +73,29 @@ class Paciente {
     //Insere um paciente no banco de dados
     static async cadastrarPaciente(paciente: PacienteDTO): Promise<boolean> {
         try {
+            // Normaliza o CPF removendo quaisquer caracteres que não sejam dígitos
+            const cpfNormalized = (paciente.cpf || "").toString().replace(/\D/g, "");
+
+            // Verifica se o CPF já existe para evitar violação da restrição de unicidade
+            const checkCpfSql = `SELECT 1 FROM paciente WHERE cpf = $1 AND situacao = TRUE;`;
+            const cpfExists = await database.query(checkCpfSql, [cpfNormalized]);
+
+            if (cpfExists.rows.length > 0) {
+                console.warn(`Tentativa de cadastrar CPF duplicado: ${cpfNormalized}`);
+                return false;
+            }
+
             const queryInsertPaciente = `CALL sp_cadastrar_paciente($1, $2, $3, $4);`;
 
             const respostaBD = await database.query(queryInsertPaciente, [
                 paciente.nome.toUpperCase(),
-                paciente.cpf,
+                cpfNormalized,
                 paciente.telefone,
                 paciente.dataNascimento ? paciente.dataNascimento.toString().split('T')[0] : null
             ]);
 
-            if (respostaBD.rows.length > 0) {
-                console.info(`Paciente cadastrado com sucesso. ID: ${respostaBD.rows[0].id_paciente}`);
-                return true;
-            }
-            return false;
+            console.info(`Paciente cadastrado com sucesso. ${respostaBD.command}`);
+            return true;
         } catch (error) {
             console.error(`Erro na consulta ao banco de dados: ${error}`);
             return false;
@@ -175,9 +184,11 @@ static async atualizarPaciente(paciente: Paciente): Promise<boolean> {
             SELECT id_paciente FROM paciente 
             WHERE cpf = $1 AND id_paciente != $2
         `;
-        
+        // Normaliza o CPF antes de verificar
+        const cpfNormalized = (paciente.getCpf() || "").toString().replace(/\D/g, "");
+
         const checkCpfResult = await conexao.query(checkCpfSql, [
-            paciente.getCpf(),
+            cpfNormalized,
             paciente.getIdPaciente()
         ]);
 
@@ -190,13 +201,18 @@ static async atualizarPaciente(paciente: Paciente): Promise<boolean> {
         // 2. Procede com a atualização se o CPF é válido
         const sql = `CALL sp_atualizar_paciente($1, $2, $3, $4, $5)`;
 
+        // Formata data para YYYY-MM-DD ou NULL
+        const dataNascimentoFormatted = paciente.getDataNascimento()
+            ? paciente.getDataNascimento().toString().split('T')[0]
+            : null;
+
         const valores = [
+            // Ordem esperada pela procedure: id, nome, cpf, telefone, data_nascimento
+            paciente.getIdPaciente(),
             paciente.getNome(),
-            paciente.getCpf(),
-            paciente.getDataNascimento(),
-            paciente.getTelefone() || null, // Garante NULL no banco se estiver vazio
-            paciente.getSituacao() !== undefined ? paciente.getSituacao() : true,
-            paciente.getIdPaciente()
+            cpfNormalized,
+            paciente.getTelefone() || null,
+            dataNascimentoFormatted
         ];
 
         const result = await conexao.query(sql, valores);
