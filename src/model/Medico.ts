@@ -81,12 +81,8 @@ class Medico {
                 Medico.valorConsulta
             ]);
 
-            if (respostaBD.rows.length > 0) {
-                console.info(`Medico cadastrado com sucesso. ID: ${respostaBD.rows[0].id_medico}.`);
-                return true;
-            }
-
-            return false;
+            console.info(`Medico cadastrado com sucesso. ${respostaBD.command}`);
+            return true;
         } catch (error) {
             console.error(`Erro na consulta ao banco de dados. ${error}`);
             return false;

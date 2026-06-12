@@ -12,8 +12,13 @@ CREATE OR REPLACE PROCEDURE sp_cadastrar_paciente(
 LANGUAGE plpgsql
 AS $$
 BEGIN
+    -- Verifica CPF duplicado em pacientes ativos
+    IF EXISTS (SELECT 1 FROM paciente WHERE cpf = p_cpf AND situacao = TRUE) THEN
+        RAISE EXCEPTION 'CPF já cadastrado.';
+    END IF;
+
     INSERT INTO Paciente (
-        nome,             
+        nome,
         cpf,
         telefone,
         data_nascimento
@@ -24,6 +29,11 @@ BEGIN
         p_telefone,
         p_data_nascimento
     );
+
+EXCEPTION
+    WHEN unique_violation THEN
+        -- Repassa uma mensagem clara sobre duplicidade
+        RAISE EXCEPTION 'CPF já cadastrado (violação de unicidade).';
 END;
 $$;
 
