@@ -22,8 +22,8 @@ router.get("/api", (req: Request, res: Response) => {
 
 // Retorna a lista com todos os pacientes (Ordem Alfabética)
 router.get("/api/pacientes", Auth.verifyToken ,PacienteController.todos);
-// Insere um novo paciente no banco de dados
-router.post("/api/pacientes", Auth.verifyToken ,PacienteController.novo);
+// Insere um novo paciente no banco de dados (rota pública para registro)
+router.post("/api/pacientes", PacienteController.novo);
 // Retorna o paciente pelo ID
 router.get("/api/pacientes/:idPaciente", Auth.verifyToken ,PacienteController.paciente);
 // Deleta o paciente pelo ID
@@ -40,7 +40,7 @@ router.post("/api/medicos", Auth.verifyToken ,MedicoController.novo);
 router.get("/api/medicos/:idMedico", Auth.verifyToken ,MedicoController.medico);
 // Deleta o médico pelo ID
 router.delete("/api/medicos/:idMedico", Auth.verifyToken ,MedicoController.remover);
-
+// Atualiza um médico pelo ID
 router.put("/api/medicos/:idMedico", Auth.verifyToken ,MedicoController.atualizar);
 
 // Retorna a lista com todas as consultas

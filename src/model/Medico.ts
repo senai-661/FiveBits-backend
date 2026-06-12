@@ -72,8 +72,7 @@ class Medico {
     // Insere um médico no banco de dados
   static async cadastrarMedico(Medico: MedicoDTO): Promise<boolean> {
         try {
-            const queryInsertMedico = `INSERT INTO Medico (nome, crm, especialidade, valor_consulta) VALUES
-                                       ($1, $2, $3, $4) RETURNING id_medico;`;
+            const queryInsertMedico = `CALL sp_cadastrar_medico($1, $2, $3, $4);`;
 
             const respostaBD = await database.query(queryInsertMedico, [
                 Medico.nome.toUpperCase(),
@@ -82,12 +81,8 @@ class Medico {
                 Medico.valorConsulta
             ]);
 
-            if (respostaBD.rows.length > 0) {
-                console.info(`Medico cadastrado com sucesso. ID: ${respostaBD.rows[0].id_medico}.`);
-                return true;
-            }
-
-            return false;
+            console.info(`Medico cadastrado com sucesso. ${respostaBD.command}`);
+            return true;
         } catch (error) {
             console.error(`Erro na consulta ao banco de dados. ${error}`);
             return false;
@@ -99,7 +94,7 @@ class Medico {
         try {
             let listaMedicos: Array<Medico> = [];
             // Regra da Sprint: Ordem Alfabética para entidades principais
-            const querySelectMedicos = `SELECT * FROM Medico WHERE situacao=TRUE ORDER BY nome ASC;`;
+            const querySelectMedicos = `SELECT * FROM vw_medicos ORDER BY nome ASC;`;
             const respostaBD = await database.query(querySelectMedicos);
 
             respostaBD.rows.forEach((medicoBD) => {
@@ -125,7 +120,7 @@ class Medico {
     // Lista um médico pelo ID
     static async listarMedico(idMedico: number): Promise<Medico | null> {
         try {
-            const querySelectMedico = `SELECT * FROM Medico WHERE id_medico=$1 AND situacao=TRUE;`;
+            const querySelectMedico = `SELECT * FROM vw_medicos WHERE id_medico=$1;`;
 
             const respostaBD = await database.query(querySelectMedico, [idMedico]);
 
@@ -149,7 +144,7 @@ class Medico {
 
     static async deletarMedico(idMedico: number): Promise<boolean> {
         try {
-            const queryDeleteMedico = `UPDATE Medico SET situacao = FALSE WHERE id_medico = $1`;
+            const queryDeleteMedico = `CALL sp_deletar_medico($1);`;
 
             const respostaBD = await database.query(queryDeleteMedico, [idMedico]);
 
@@ -170,16 +165,7 @@ class Medico {
     try {
         conexao = await database.connect(); 
 
-        const sql = `
-            UPDATE Medico 
-            SET 
-                nome = $1, 
-                crm = $2, 
-                especialidade = $3, 
-                valor_consulta = $4, 
-                situacao = $5
-            WHERE id_medico = $6
-        `;
+        const sql = `CALL sp_atualizar_medico($1, $2, $3, $4, $5);`;
 
         const valores = [
             medico.getNome(),
