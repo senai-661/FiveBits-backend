@@ -9,8 +9,9 @@ CREATE OR REPLACE PROCEDURE sp_cadastrar_paciente(
     p_telefone      VARCHAR(20),   
     p_data_nascimento DATE
 )
-LANGUAGE SQL
+LANGUAGE plpgsql
 AS $$
+BEGIN
     INSERT INTO Paciente (
         nome,             
         cpf,
@@ -23,6 +24,7 @@ AS $$
         p_telefone,
         p_data_nascimento
     );
+END;
 $$;
 
 -- 2. Procedure para Deletar Pacientes
@@ -53,16 +55,18 @@ AS $$
         telefone = p_telefone,
         data_nascimento = p_data_nascimento
     WHERE id_paciente = p_id_paciente;
+$$;
     
 -- 4. Procedure para Cadastrar Medico    
 CREATE OR REPLACE PROCEDURE sp_cadastrar_medico(
-    nome VARCHAR (50),
-    crm VARCHAR (13),
-    especialidade VARCHAR (100),
-	valor_consulta DECIMAL (6,2)
+    p_nome           VARCHAR(50),
+    p_crm            VARCHAR(13),
+    p_especialidade  VARCHAR(100),
+    p_valor_consulta DECIMAL(6,2)
 )
-LANGUAGE SQL
+LANGUAGE plpgsql
 AS $$
+BEGIN
     INSERT INTO medico (
         nome,
         crm,
@@ -70,11 +74,12 @@ AS $$
         valor_consulta
     )
     VALUES (
-        nome,
-        crm,
-        especialidade,
-        valor_consulta
+        p_nome,
+        p_crm,
+        p_especialidade,
+        p_valor_consulta
     );
+END;
 $$;
 
 -- 5. Procedure para Deletar Medico
