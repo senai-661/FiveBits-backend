@@ -13,7 +13,7 @@ class Paciente {
     private situacao: boolean = true;
 
     // Constructor da Classe Paciente
-    constructor( 
+    constructor(
         _nome: string,
         _cpf: string,
         _dataNascimento: Date,
@@ -160,8 +160,8 @@ class Paciente {
             const queryDeletePaciente = `CALL sp_deletar_paciente($1);`;
 
             const respostaBD = await database.query(queryDeletePaciente, [idPaciente]);
-            
-            if(respostaBD.rowCount != 0) {
+
+            if (respostaBD.rowCount != 0) {
                 console.info(`Paciente removido com sucesso`);
                 return true;
             }
@@ -172,63 +172,71 @@ class Paciente {
             return false;
         }
     }
-   
-static async atualizarPaciente(paciente: Paciente): Promise<boolean> {
-    let conexao: any;
 
-    try {
-        conexao = await database.connect(); 
+    static async atualizarPaciente(paciente: Paciente): Promise<boolean> {
+        let conexao: any;
 
-        // 1. Verifica se o CPF já existe em outro paciente
-        const checkCpfSql = `
+        try {
+            conexao = await database.connect();
+
+            // 1. Verifica se o CPF já existe em outro paciente
+            const checkCpfSql = `
             SELECT id_paciente FROM paciente 
             WHERE cpf = $1 AND id_paciente != $2
         `;
-        // Normaliza o CPF antes de verificar
-        const cpfNormalized = (paciente.getCpf() || "").toString().replace(/\D/g, "");
+            // Normaliza o CPF antes de verificar
+            const cpfNormalized = (paciente.getCpf() || "").toString().replace(/\D/g, "");
 
-        const checkCpfResult = await conexao.query(checkCpfSql, [
-            cpfNormalized,
-            paciente.getIdPaciente()
-        ]);
+            const checkCpfResult = await conexao.query(checkCpfSql, [
+                cpfNormalized,
+                paciente.getIdPaciente()
+            ]);
 
-        // Se o CPF já existe em outro paciente, rejeita a atualização
-        if (checkCpfResult.rows.length > 0) {
-            console.error(`[MODEL ERROR]: CPF ${paciente.getCpf()} já existe em outro paciente`);
-            return false;
-        }
+            // Se o CPF já existe em outro paciente, rejeita a atualização
+            if (checkCpfResult.rows.length > 0) {
+                console.error(`[MODEL ERROR]: CPF ${paciente.getCpf()} já existe em outro paciente`);
+                return false;
+            }
 
-        // 2. Procede com a atualização se o CPF é válido
-        const sql = `CALL sp_atualizar_paciente($1, $2, $3, $4, $5)`;
+            const pacienteResult = await conexao.query(
+                "SELECT 1 FROM paciente WHERE id_paciente = $1",
+                [paciente.getIdPaciente()]
+            );
 
-        // Formata data para YYYY-MM-DD ou NULL
-        const dataNascimentoFormatted = paciente.getDataNascimento()
-            ? paciente.getDataNascimento().toString().split('T')[0]
-            : null;
+            if (pacienteResult.rows.length === 0) {
+                return false;
+            }
 
-        const valores = [
-            // Ordem esperada pela procedure: id, nome, cpf, telefone, data_nascimento
-            paciente.getIdPaciente(),
-            paciente.getNome(),
-            cpfNormalized,
-            paciente.getTelefone() || null,
-            dataNascimentoFormatted
-        ];
+            // 2. Procede com a atualização se o CPF é válido
+            const sql = `CALL sp_atualizar_paciente($1, $2, $3, $4, $5)`;
 
-        const result = await conexao.query(sql, valores);
+            // Formata data para YYYY-MM-DD ou NULL
+            const dataNascimentoFormatted = paciente.getDataNascimento()
+                ? paciente.getDataNascimento().toISOString().split('T')[0]
+                : null;
 
-        // Verifica se alguma linha foi afetada (se o ID existia)
-        return result.rowCount > 0;
+            const valores = [
+                // Ordem esperada pela procedure: id, nome, cpf, telefone, data_nascimento
+                paciente.getIdPaciente(),
+                paciente.getNome(),
+                cpfNormalized,
+                paciente.getTelefone() || null,
+                dataNascimentoFormatted
+            ];
 
-    } catch (error) {
-        console.error(`[MODEL ERROR]: Falha ao atualizar paciente no banco: ${error}`);
-        throw error; // Repassa o erro para o Controller tratar no try/catch de lá
-    } finally {
-        if (conexao) {
-            conexao.release();
+            const result = await conexao.query(sql, valores);
+
+            return result.command === "CALL";
+
+        } catch (error) {
+            console.error(`[MODEL ERROR]: Falha ao atualizar paciente no banco: ${error}`);
+            throw error; // Repassa o erro para o Controller tratar no try/catch de lá
+        } finally {
+            if (conexao) {
+                conexao.release();
+            }
         }
     }
-}
 }
 
 export default Paciente;
