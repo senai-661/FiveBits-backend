@@ -213,16 +213,12 @@ class Consulta {
 
     static async deletarConsulta(idConsulta: number): Promise<boolean> {
         try {
-            const queryDeleteConsulta = `CALL sp_cancelar_consulta(p_id_consulta = $1);`;
+            const queryDeleteConsulta = `CALL sp_cancelar_consulta($1);`;
 
-            const respostaBD = await database.query(queryDeleteConsulta, [idConsulta]);
+            await database.query(queryDeleteConsulta, [idConsulta]);
 
-            if(respostaBD.rowCount != 0) {
-                console.info(`Consulta removida com sucesso`);
-                return true;
-            }
-
-            return false;
+            console.info(`Consulta removida com sucesso`);
+            return true;
         } catch (error) {
             console.error(`Erro ao remover Consulta do banco de dados. ${error}`);
             return false;
@@ -251,9 +247,18 @@ class Consulta {
             consulta.getTriagemSintomas() || null
         ];
 
-        const result = await conexao.query(sql, valores);
+        const consultaExistente = await conexao.query(
+            `SELECT 1 FROM consulta WHERE id_consulta = $1 AND situacao = TRUE`,
+            [consulta.getIdConsulta()]
+        );
 
-        return result.rowCount > 0;
+        if (consultaExistente.rowCount === 0) {
+            return false;
+        }
+
+        await conexao.query(sql, valores);
+
+        return true;
 
     } catch (error) {
         console.error(`[MODEL ERROR]: Falha ao atualizar consulta no banco: ${error}`);

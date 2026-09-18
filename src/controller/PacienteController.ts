@@ -134,12 +134,20 @@ class PacienteController extends Paciente {
             });
         }
 
+        const dataNascimentoParsed = new Date(dataNascimento);
+
+        if (Number.isNaN(dataNascimentoParsed.getTime())) {
+            return res.status(400).json({
+                mensagem: "Data de Nascimento inválida. Use o formato YYYY-MM-DD."
+            });
+        }
+
         // 4. Instanciação e Configuração:
         // Criamos o objeto Paciente (ajuste o nome da classe conforme seu projeto)
         const paciente = new Paciente(
             nome,
             cpf,
-            new Date(dataNascimento),
+            dataNascimentoParsed,
             telefone, // Opcional
             situacao ?? true // Default caso não seja enviado
         );
@@ -157,7 +165,7 @@ class PacienteController extends Paciente {
 
         // Verifica se o paciente não foi encontrado ou se o CPF já existe
         return res.status(400).json({ 
-            mensagem: "Falha na atualização: CPF já existe em outro paciente ou paciente não encontrado." 
+            mensagem: "Falha na atualização: paciente não encontrado ou dados inválidos." 
         });
 
     } catch (error) {

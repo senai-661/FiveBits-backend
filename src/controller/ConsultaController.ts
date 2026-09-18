@@ -131,13 +131,19 @@ class ConsultaController extends Consulta {
             });
         }
 
-        // 2. Desestruturação baseada no ConsultaDTO
-        const { paciente: { idPaciente }, medico: { idMedico }, dataHora, status, modalidade, triagemSintomas, situacao }: ConsultaDTO = req.body;
+        // Aceita o formato plano usado nas requisições e o formato aninhado retornado pela API.
+        const corpo = req.body as ConsultaDTO & {
+            idPaciente?: number;
+            idMedico?: number;
+        };
+        const idPaciente = corpo.idPaciente ?? corpo.paciente?.idPaciente;
+        const idMedico = corpo.idMedico ?? corpo.medico?.idMedico;
+        const { dataHora, status, modalidade, triagemSintomas, situacao } = corpo;
 
         // 3. Validação de Campos Obrigatórios (da regra de negócio)
-        if (!dataHora || !modalidade || !triagemSintomas) {
+        if (!dataHora || !modalidade || !triagemSintomas || !idPaciente || !idMedico) {
             return res.status(400).json({ 
-                mensagem: "Data/Hora, modalidade e triagem são obrigatórios para atualizar a consulta." 
+                mensagem: "ID do paciente, ID do médico, data/hora, modalidade e triagem são obrigatórios para atualizar a consulta." 
             });
         }
 

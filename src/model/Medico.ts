@@ -168,18 +168,25 @@ class Medico {
         const sql = `CALL sp_atualizar_medico($1, $2, $3, $4, $5);`;
 
         const valores = [
+            medico.getIdMedico(),
             medico.getNome(),
             medico.getCrm(),
             medico.getEspecialidade(),
-            medico.getValorConsulta(),
-            medico.getSituacao() !== undefined ? medico.getSituacao() : true,
-            medico.getIdMedico()
+            medico.getValorConsulta()
         ];
 
-        const result = await conexao.query(sql, valores);
+        const medicoExistente = await conexao.query(
+            `SELECT 1 FROM medico WHERE id_medico = $1 AND situacao = TRUE`,
+            [medico.getIdMedico()]
+        );
 
-        // Retorna true se o registro foi encontrado e alterado
-        return result.rowCount > 0;
+        if (medicoExistente.rowCount === 0) {
+            return false;
+        }
+
+        await conexao.query(sql, valores);
+
+        return true;
 
     } catch (error) {
         console.error(`[MODEL ERROR]: Falha ao atualizar médico: ${error}`);
