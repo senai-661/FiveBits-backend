@@ -1,171 +1,141 @@
-import type { Request, Response } from "express";
-import Medico from "../model/Medico.js"; // Importa o model do médico
-import type { MedicoDTO } from "../interface/MedicoDTO.js"; // Importa a interface DTO do médico
+import type {Request, Response} from "express"
+import Medico from "../model/Medico.js";  
+import type { MedicoDTO } from "../interface/MedicoDTO.js";
+import MedicoRepository from "../repositories/MedicoRepository.js";
 
 /**
- * Classe responsável por receber a requisição do Medico, 
- * processar essa requisição e devolver a resposta adequada.
- * * Estende a classe Medico para seguir o padrão de arquitetura proposto.
+ * Controller responsável por manipular requisições HTTP relacionadas a Médicos.
  */
-class MedicoController extends Medico {
+class MedicoController {
 
     /**
-     * Faz a chamada ao modelo para obter a lista de Medicos e devolve ao cliente.
-     * @param req Requisição do cliente
-     * @param res Resposta do servidor
-     * @returns (200) Lista de todos os Medicos em ordem alfabética
-     * @returns (500) Erro na consulta ao banco de dados
+     * Obtém a lista de todos os médicos.
      */
     static async todos(req: Request, res: Response): Promise<Response> {
         try {
-            // Chama o método listarMedicos da classe Medico (Model)
-            const listarMedicos: Array<Medico> | null = await Medico.listarMedicos();
-
-            // Retorna status 200 (OK) e a lista de Medicos em formato JSON
-            return res.status(200).json(listarMedicos);
+            const medicos = await MedicoRepository.listarMedicos();
+            return res.status(200).json(medicos ?? []);
         } catch (error) {
-            // Log de erro para depuração
-            console.error(`Erro ao consultar modelo: ${error}`);
-
-            // Retorna status 500 (Internal Server Error)
-            return res.status(500).json({ mensagem: "Não foi possível acessar a lista de Medicos." });
+            console.error(`[ERRO - MedicoController.todos]: ${error}`);
+            return res.status(500).json({ mensagem: "Não foi possível acessar a lista de Médicos." });
         }
     }
 
     /**
-     * Faz a chamada ao modelo para inserir um novo Medico.
-     * @param req Requisição do cliente contendo o corpo (body) com os dados do Medico
-     * @param res Resposta do servidor
-     * @returns (201) Mensagem de sucesso no cadastro
-     * @returns (400) Erro nos dados enviados ou falha no cadastro
-     * @returns (500) Erro interno no processamento do modelo
+     * Insere um novo médico.
      */
     static async novo(req: Request, res: Response): Promise<Response> {
         try {
-            // Extrai os dados do corpo da requisição
-            const dadosRecebidosMedico: MedicoDTO = req.body;
+            const dadosMedico: MedicoDTO = req.body;
 
-            // Chama o método cadastrarMedico do Model, que retorna um booleano
-            const respostaModelo = await Medico.cadastrarMedico(dadosRecebidosMedico);
-
-            // Verifica se o cadastro foi realizado com sucesso no banco
-            if (respostaModelo) {
-                // Status 201 (Created) para novos registros
-                return res.status(201).json({ mensagem: "Medico cadastrado com sucesso." });
-            } else {
-                // Status 400 (Bad Request) se houver erro de negócio (ex: CPF duplicado)
-                return res.status(400).json({ mensagem: "Erro ao cadastrar Medico. Verifique os dados." });
+            // Validação simples dos campos obrigatórios da requisição
+            if (!dadosMedico.nome || !dadosMedico.crm || !dadosMedico.especialidade || dadosMedico.valorConsulta === undefined) {
+                return res.status(400).json({ 
+                    mensagem: "Dados incompletos. Os campos nome, crm, especialidade e valorConsulta são obrigatórios." 
+                });
             }
-        } catch (error) {
-            // Log de erro inesperado no console
-            console.error(`Erro no processamento do modelo: ${error}`);
 
-            // Status 500 (Internal Server Error)
-            return res.status(500).json({ mensagem: "Não foi possível inserir o Medico devido a um erro interno." });
+            const sucesso = await MedicoRepository.cadastrarMedico(dadosMedico);
+
+            if (sucesso) {
+                return res.status(201).json({ mensagem: "Médico cadastrado com sucesso." });
+            }
+
+            return res.status(400).json({ mensagem: "Erro ao cadastrar Médico. Verifique os dados enviados." });
+        } catch (error) {
+            console.error(`[ERRO - MedicoController.novo]: ${error}`);
+            return res.status(500).json({ mensagem: "Não foi possível inserir o Médico devido a um erro interno." });
         }
     }
 
     /**
-     * Faz a chamada ao modelo para obter o ID de um médico e devolve ao cliente.
-     * @param req Requisição do cliente
-     * @param res Resposta do servidor
-     * @returns (200) Lista um objeto Medico pelo ID
-     * @returns (500) Erro na consulta ao banco de dados
+     * Busca um médico pelo seu ID.
      */
     static async medico(req: Request, res: Response): Promise<Response> {
         try {
-            // Chama o ID do médico
-            const idMedico: number = parseInt(req.params.idMedico as string);
+            const idMedico = Number(req.params.idMedico ?? req.params.id);
 
-            // Chama o método listarMedico do Model, que retorna um objeto do tipo medico
-            const respostaModelo = await Medico.listarMedico(idMedico);
+            if (isNaN(idMedico)) {
+                return res.status(400).json({ mensagem: "ID inválido. Informe um número válido." });
+            }
 
-            // Retorna status 200 (OK) e a lista de Consultas em formato JSON
-            return res.status(200).json(respostaModelo);
+            const medicoEncontrado = await MedicoRepository.listarMedico(idMedico);
+
+            if (!medicoEncontrado) {
+                return res.status(404).json({ mensagem: "Médico não encontrado." });
+            }
+
+            return res.status(200).json(medicoEncontrado);
         } catch (error) {
-            // Log de erro para depuração
-            console.error(`Erro no modelo ${error}`);
-
-            // Status 500 (Internal Server Error)
-            return res.status(500).json({ mensagem: "Não foi possível obter informação de Medico" });
+            console.error(`[ERRO - MedicoController.medico]: ${error}`);
+            return res.status(500).json({ mensagem: "Não foi possível obter informações do Médico." });
         }
     }
 
     /**
-    * Método para remover um medico do banco de dados
-    * 
-    * @param req Objeto de requisição HTTP com o ID do medico a ser removido.
-    * @param res Objeto de resposta HTTP.
-    * @returns Mensagem de sucesso ou erro em formato JSON.
-    */
+     * Remove um médico pelo ID.
+     */
     static async remover(req: Request, res: Response): Promise<Response> {
         try {
-            // Lê o parâmetro "idMedico" da URL e converte para número inteiro
-            const idMedico = parseInt(req.params.idMedico as string);
+            const idMedico = Number(req.params.idMedico ?? req.params.id);
 
-            // Chama o método do model para remover (logicamente) o Medico com o ID informado
-            const result = await Medico.deletarMedico(idMedico);
-
-            // Verifica o retorno do model: true = remoção bem-sucedida, false = falha
-            if (result) {
-                return res.status(200).json({ mensagem: 'Medico removido com sucesso.' });
-            } else {
-                // Retorna status HTTP 404 (Not Found) se o Medico não foi encontrado ou já estava inativo
-                return res.status(404).json({ mensagem: 'Medico não encontrado para exclusão.' });
+            if (isNaN(idMedico)) {
+                return res.status(400).json({ mensagem: "ID inválido. Informe um número válido." });
             }
+
+            const removido = await MedicoRepository.deletarMedico(idMedico);
+
+            if (removido) {
+                return res.status(200).json({ mensagem: "Médico removido com sucesso." });
+            }
+
+            return res.status(404).json({ mensagem: "Médico não encontrado para exclusão." });
         } catch (error) {
-            // Exibe o erro no console e retorna status HTTP 500 em caso de exceção
-            console.error("Erro ao remover o Medico: ", error);
-            return res.status(500).json({ mensagem: 'Erro ao remover o Medico.' });
+            console.error(`[ERRO - MedicoController.remover]: ${error}`);
+            return res.status(500).json({ mensagem: "Erro ao remover o Médico." });
         }
     }
+
+    /**
+     * Atualiza os dados de um médico existente.
+     */
     static async atualizar(req: Request, res: Response): Promise<Response> {
-    try {
-       
-        const idMedico = Number(req.params.idMedico ?? req.params.id);
+        try {
+            const idMedico = Number(req.params.idMedico ?? req.params.id);
 
-        if (isNaN(idMedico)) {
-            return res.status(400).json({ 
-                mensagem: "ID inválido. A atualização requer um identificador numérico." 
-            });
+            if (isNaN(idMedico)) {
+                return res.status(400).json({ mensagem: "ID inválido. A atualização requer um identificador numérico." });
+            }
+
+            const { nome, crm, especialidade, valorConsulta, situacao }: MedicoDTO = req.body;
+
+            if (!nome || !crm || !especialidade || valorConsulta === undefined) {
+                return res.status(400).json({ 
+                    mensagem: "Todos os campos (nome, crm, especialidade, valorConsulta) são obrigatórios." 
+                });
+            }
+
+            const medico = new Medico(
+                nome,
+                crm,
+                especialidade,
+                valorConsulta,
+                situacao ?? true,
+                
+            );
+
+            const atualizado = await MedicoRepository.atualizarMedico(medico);
+
+            if (atualizado) {
+                return res.status(200).json({ mensagem: "Médico atualizado com sucesso." });
+            }
+
+            return res.status(404).json({ mensagem: "Médico não encontrado para atualização." });
+        } catch (error) {
+            console.error(`[ERRO - MedicoController.atualizar]: ${error}`);
+            return res.status(500).json({ mensagem: "Erro interno ao atualizar os dados do médico." });
         }
-
-        const { nome, crm, especialidade, valorConsulta, situacao }: MedicoDTO = req.body;
-
-        
-        if (!nome || !crm || !especialidade || !valorConsulta) {
-            return res.status(400).json({ 
-                mensagem: "Todos os campos (nome, crm, especialidade, valorConsulta) são obrigatórios." 
-            });
-        }
-
-      
-        const medico = new Medico(
-            nome,
-            crm,
-            especialidade,
-            valorConsulta,
-            situacao ?? true
-        );
-        medico.setIdMedico(idMedico);
-
-        
-        const result = await Medico.atualizarMedico(medico);
-
-       
-        if (result) {
-            return res.status(200).json({ mensagem: "Médico atualizado com sucesso." });
-        }
-
-        return res.status(404).json({ mensagem: "Médico não encontrado para atualização." });
-
-    } catch (error) {
-        console.error(`[ERRO NA ATUALIZAÇÃO DE MÉDICO]: ${error}`);
-        return res.status(500).json({ 
-            mensagem: "Erro interno ao atualizar os dados do médico." 
-        });
     }
 }
-}
 
-export default MedicoController
+export default MedicoController;
