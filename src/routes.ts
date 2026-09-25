@@ -5,6 +5,7 @@ import PacienteController from "./controller/PacienteController.js";
 import MedicoController from "./controller/MedicoController.js";
 import ConsultaController from "./controller/ConsultaController.js";
 import { Auth } from "./middlewares/Auth.js";
+import { AuthController } from "./controller/AuthController.js";
 
 const router = Router();
 
@@ -55,6 +56,6 @@ router.delete("/api/consultas/:idConsulta", Auth.verifyToken ,ConsultaController
 router.put("/api/consultas/:idConsulta",  Auth.verifyToken ,ConsultaController.atualizar);
 
 
-router.post('/api/login', Auth.validacaoUsuario);
+router.post('/api/login', AuthController.login);
 
 export { router };
