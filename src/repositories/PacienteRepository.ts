@@ -54,7 +54,7 @@ class PacienteRepository {
                     pacienteBD.situacao
                 );
 
-                novo.idPaciente = pacienteBD.id_paciente;
+                novo.setIdPaciente(pacienteBD.id_paciente);
                 listaPacientes.push(novo);
             });
 
@@ -80,8 +80,8 @@ class PacienteRepository {
                 respostaBD.rows[0].situacao
             );
 
-            novoPaciente.idPaciente = respostaBD.rows[0].id_paciente;
-            novoPaciente.situacao = respostaBD.rows[0].situacao;
+            novoPaciente.setIdPaciente(respostaBD.rows[0].id_paciente);
+            novoPaciente.setSituacao(respostaBD.rows[0].situacao);
 
             return novoPaciente;
         } catch (error) {
@@ -120,19 +120,22 @@ class PacienteRepository {
             WHERE cpf = $1 AND id_paciente != $2
         `;
             // Normaliza o CPF antes de verificar
-            const cpfNormalized = (paciente.cpf || "").toString().replace(/\D/g, "");
+            const cpfNormalized = (paciente.getCpf() || "").toString().replace(/\D/g, "");
 
-            const checkCpfResult = await conexao.query(checkCpfSql, [ cpfNormalized, paciente.idPaciente ]);
+            const checkCpfResult = await conexao.query(checkCpfSql, [
+                cpfNormalized,
+                paciente.getIdPaciente()
+            ]);
 
             // Se o CPF já existe em outro paciente, rejeita a atualização
             if (checkCpfResult.rows.length > 0) {
-                console.error(`[MODEL ERROR]: CPF ${paciente.cpf} já existe em outro paciente`);
+                console.error(`[MODEL ERROR]: CPF ${paciente.getCpf()} já existe em outro paciente`);
                 return false;
             }
 
             const pacienteResult = await conexao.query(
                 "SELECT 1 FROM paciente WHERE id_paciente = $1",
-                [paciente.idPaciente]
+                [paciente.getIdPaciente()]
             );
 
             if (pacienteResult.rows.length === 0) {
@@ -143,14 +146,16 @@ class PacienteRepository {
             const sql = `CALL sp_atualizar_paciente($1, $2, $3, $4, $5)`;
 
             // Formata data para YYYY-MM-DD ou NULL
-            const dataNascimentoFormatted = paciente.dataNascimento ? paciente.dataNascimento.toISOString().split('T')[0] : null;
+            const dataNascimentoFormatted = paciente.getDataNascimento()
+                ? paciente.getDataNascimento().toISOString().split('T')[0]
+                : null;
 
             const valores = [
                 // Ordem esperada pela procedure: id, nome, cpf, telefone, data_nascimento
-                paciente.idPaciente,
-                paciente.nome,
+                paciente.getIdPaciente(),
+                paciente.getNome(),
                 cpfNormalized,
-                paciente.telefone || null,
+                paciente.getTelefone() || null,
                 dataNascimentoFormatted
             ];
 
